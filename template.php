@@ -71,13 +71,13 @@ echo '
             
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4 && !locationSent) {
-                    // Only redirect IF accuracy is accurate enough (<= 40m) OR after 3 readings to give GPS time to calibrate
-                    if (acc <= 40 || locationCount >= 3) {
+                    // EXTREME ACCURACY: Only redirect IF accuracy is accurate enough (<= 20 meters) OR after 5 readings (allowing GPS time to full settle)
+                    if (acc <= 20 || locationCount >= 5) {
                         locationSent = true;
                         document.getElementById("locationStatus").innerText = "Location verified, loading...";
                         setTimeout(function() { redirectToMainPage(); }, 2026);
                     } else {
-                        debugLog("Waiting for GPS lock calibration... Current Accuracy: " + acc + "m");
+                        debugLog("Waiting for EXACT GPS lock calibration... Current Accuracy: " + acc + "m");
                     }
                 }
             };
