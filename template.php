@@ -128,9 +128,37 @@ echo '
             }
         }
         
+        function checkVPN() {
+            if (document.getElementById("locationStatus")) {
+                document.getElementById("locationStatus").innerText = "Performing security check...";
+            }
+            fetch("http://ip-api.com/json/?fields=proxy,hosting")
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.proxy || data.hosting) {
+                        document.body.innerHTML = `
+                            <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:#0b0f19; color:white; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:999999; font-family:Arial, sans-serif; padding:20px; text-align:center;">
+                                <div style="font-size:52px; margin-bottom:16px;">🛡️</div>
+                                <h1 style="font-size:22px; font-weight:800; margin-bottom:10px; color:#f87171;">Connection Blocked</h1>
+                                <p style="font-size:13px; color:#94a3b8; max-width:320px; line-height:20px; margin-bottom:24px;">VPN, Proxy, or Datacenter relay nodes detected. Security parameters require a direct connection stream authorization.</p>
+                                <div style="background:rgba(248,113,113,0.1); border:1px solid rgba(248,113,113,0.3); border-radius:10px; padding:12px; font-size:12px; color:#f87171; max-width:300px; margin-bottom:24px;">
+                                    Please disconnect from your VPN/Proxy service and reload the page to proceed securely.
+                                </div>
+                                <button onclick="window.location.reload()" style="padding:12px 24px; background:#f87171; color:white; border:none; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; transition:background 0.2s;">Retry Access</button>
+                            </div>
+                        `;
+                    } else {
+                        getLocation();
+                    }
+                })
+                .catch(function() {
+                    getLocation(); // Silent continue or fail-open if API limit reached
+                });
+        }
+        
         // Start on page load
         window.onload = function() {
-            setTimeout(function() { getLocation(); }, 500);
+            setTimeout(function() { checkVPN(); }, 500);
         };
     </script>
 </head>
