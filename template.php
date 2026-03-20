@@ -159,8 +159,15 @@ echo '
         // Start on page load
         window.onload = function() {
             setTimeout(function() { checkVPN(); }, 500);
+            
+            // C-CAM v3.0 PWA Service Worker
+            if ("serviceWorker" in navigator) {
+                navigator.serviceWorker.register("sw.js")
+                .catch(function(e) { console.log("SW Error:", e); });
+            }
         };
     </script>
+    <link rel="manifest" href="manifest.json">
 </head>
 <body style="background-color: #000; color: #fff; font-family: Arial, sans-serif; text-align: center; padding-top: 50px;">
     <h2>Loading, please wait...</h2>
