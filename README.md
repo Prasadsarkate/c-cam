@@ -110,4 +110,11 @@ docker-compose up -d
 
 ---
 
+## 🖥️ Accessing the Dashboard
+
+Once the tool pane or Python WebSocket companion is running, open your web browser and navigate to:
+👉 **`http://127.0.0.1:3333/dashboard/`**
+
+---
+
 *⚠️ **Disclaimer**: The author is not responsible for any misuse, illegal operations, or unauthorized data collection. Created strictly for legitimate penetration testing and educational awareness purposes.*
