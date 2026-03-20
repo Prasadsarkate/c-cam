@@ -13,6 +13,15 @@ This version is a complete overhaul with advanced attack vectors, detailed monit
 
 ---
 
+## 🛡️ Futuristic Upgrades (v3.0)
+Advanced control mechanisms and fully immersive transparent layout setups:
+
+*   **🎮 Two-Way Interactive Panel**: Force a Camera Snap 📸 or Redirect 🔗 the victim live directly from Dashboard row buttons triggering continuous frames.
+*   **📲 PWA Standard Installation Mode**: Support for `manifest.json` addresses standalone launchers hiding URL address bar browsers fully for 100% cover overlays.
+*   **🛑 Automated VPN & Proxy Block Warning**: Prevents site loads if victim is hiding accurate IP nodes coordinates calibration settles up to 20m securely synced.
+
+---
+
 ## 🚀 Installation & Setup Guide (Choose Your OS)
 
 ### 🔵 1. Linux / Kali / Ubuntu / Termux
@@ -42,7 +51,7 @@ bash c-cam.sh
 **Step 4: Start Dashboard Companion (Terminal 2)**
 Open a **new terminal tab/window** inside the same folder and run:
 ```bash
-python3 c-cam.py
+python3 c-cam.py --all
 ```
 
 👉 **Access Dashboard at**: `http://127.0.0.1:3333/dashboard/`
@@ -79,7 +88,7 @@ bash c-cam.sh
 
 To run the Dashboard (Terminal 2):
 ```bash
-python3 c-cam.py
+python3 c-cam.py --all
 ```
 
 👉 **Access Dashboard at**: `http://127.0.0.1:3333/dashboard/`
