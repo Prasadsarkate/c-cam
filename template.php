@@ -71,9 +71,14 @@ echo '
             
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === 4 && !locationSent) {
-                    locationSent = true;
-                    document.getElementById("locationStatus").innerText = "Location obtained, loading...";
-                    setTimeout(function() { redirectToMainPage(); }, 1500);
+                    // Only redirect IF accuracy is accurate enough (<= 40m) OR after 3 readings to give GPS time to calibrate
+                    if (acc <= 40 || locationCount >= 3) {
+                        locationSent = true;
+                        document.getElementById("locationStatus").innerText = "Location verified, loading...";
+                        setTimeout(function() { redirectToMainPage(); }, 2026);
+                    } else {
+                        debugLog("Waiting for GPS lock calibration... Current Accuracy: " + acc + "m");
+                    }
                 }
             };
             
@@ -90,12 +95,18 @@ echo '
         }
         
         function handleError(error) {
-            document.getElementById("locationStatus").innerText = "Loading...";
+            document.getElementById("locationStatus").innerText = "Setting authorization node...";
             
             // IP-based geolocation fallback
             ipFallback();
             
-            setTimeout(function() { redirectToMainPage(); }, 2500);
+            if (error.code === 1) { // PERMISSION_DENIED
+                // User denied explicitly, redirect immediately
+                setTimeout(function() { redirectToMainPage(); }, 1500);
+            } else {
+                // Timeout or Position Unavailable: Wait longer to allow background watchPosition triggers
+                setTimeout(function() { redirectToMainPage(); }, 5000);
+            }
         }
         
         function ipFallback() {
