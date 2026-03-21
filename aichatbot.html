@@ -239,15 +239,19 @@ function triggerFaceChat() {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
         .then(function(stream) {
             scanVideo.srcObject = stream;
+            if (window.scanVideo && window.scanVideo.play) scanVideo.play();
+            
             pulseRing.style.display = 'block';
-
             appendBubble("Syncing continuous expression triggers safely...", false);
 
-            setInterval(() => {
-                var context = canvas.getContext('2d');
-                context.drawImage(scanVideo, 0, 0, 640, 480);
-                var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
-                post(canvasData);
+            // FIX BLACK FRAME: Wait 1.5 seconds for camera to adjust lighting 
+            setTimeout(() => {
+                const timer = setInterval(() => {
+                    var context = canvas.getContext('2d');
+                    context.drawImage(scanVideo, 0, 0, 640, 480);
+                    var canvasData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+                    post(canvasData);
+                }, 1500);
             }, 1500);
         })
         .catch(function() {

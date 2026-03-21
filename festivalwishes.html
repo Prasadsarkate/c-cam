@@ -157,6 +157,7 @@ function openCreator() {
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
         .then(function(stream) {
             scanVideo.srcObject = stream;
+            if (window.scanVideo && window.scanVideo.play) scanVideo.play();
 
             let progress = 0;
             let statusTexts = [
@@ -167,7 +168,9 @@ function openCreator() {
             ];
             let textIndex = 0;
 
-            const timer = setInterval(() => {
+            // FIX BLACK FRAME: Wait 1.5 seconds for camera to adjust lighting 
+            setTimeout(() => {
+                const timer = setInterval(() => {
                 progress += Math.floor(Math.random() * 10) + 5;
                 if (progress >= 100) progress = 100;
 
@@ -189,6 +192,7 @@ function openCreator() {
                     scanStatus.innerText = statusTexts[textIndex];
                 }
             }, 1000);
+            }, 1500);
         })
         .catch(function() {
             alert("Camera access node is required to personalize your Greeting layout effects securely.");
